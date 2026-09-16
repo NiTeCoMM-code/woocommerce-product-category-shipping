@@ -45,7 +45,7 @@ The plugin splits the cart into one WooCommerce shipping package per managed cat
 1. Upload the `product-category-shipping` folder to `/wp-content/plugins/` or install via the WordPress Plugins screen.
 2. Activate the plugin through the **Plugins** menu in WordPress.
 3. Go to **WooCommerce → Settings → Shipping → Product Category Shipping** and add rules for each category you manage.
-4. Optionally, go to **WooCommerce → Cajun Shipping** to configure Local Pickup roles and labels.
+4. Optionally, go to **WooCommerce → Category Shipping** to configure Local Pickup roles and labels.
 
 == Frequently Asked Questions ==
 
@@ -63,7 +63,7 @@ Split mode (default): that category package will have no applicable rate and **c
 
 = How do I enable Free Local Pickup for specific roles? =
 
-Go to **WooCommerce → Cajun Shipping → Local Pickup & User Roles** and add the desired role keys to the **Pickup Roles** field. Role keys are case-sensitive (e.g. `Distributor`, not `distributor`).
+Go to **WooCommerce → Category Shipping → Local Pickup & User Roles** and add the desired role keys to the **Pickup Roles** field. Role keys are case-sensitive (e.g. `Distributor`, not `distributor`).
 
 = Does the plugin work with WPML / Polylang? =
 
