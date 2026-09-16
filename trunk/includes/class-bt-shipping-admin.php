@@ -212,8 +212,11 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         $settings   = (array) get_option( 'bt_shipping_settings', [] );
         $message    = '';
 
-        if ( isset( $_GET['bt_saved'] ) ) {
-            $message = esc_html( $_GET['bt_saved'] ) === '1'
+        if ( isset( $_GET['bt_saved'], $_GET['_wpnonce'] )
+            && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'bt_saved' )
+        ) {
+            $saved_msg = sanitize_text_field( wp_unslash( $_GET['bt_saved'] ) );
+            $message   = $saved_msg === '1'
                 ? '<div class="bt-notice success">✓ Shipping rules saved successfully.</div>'
                 : '<div class="bt-notice">Something went wrong. Please try again.</div>';
         }
@@ -237,7 +240,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 Rules apply at checkout based on item category counts in the cart.
             </p>
 
-            <?php echo $message; ?>
+            <?php echo wp_kses_post( $message ); ?>
 
             <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="bt-shipping-form">
                 <?php wp_nonce_field( 'bt_shipping_save', 'bt_nonce' ); ?>
@@ -785,14 +788,16 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
     public function save_rules() {
         if (
             ! isset( $_POST['bt_nonce'] ) ||
-            ! wp_verify_nonce( wp_unslash( $_POST['bt_nonce'] ), 'bt_shipping_save' ) ||
+            ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['bt_nonce'] ) ), 'bt_shipping_save' ) ||
             ! current_user_can( 'manage_woocommerce' )
         ) {
             wp_die( 'Unauthorized', 403 );
         }
 
         /* ---- GLOBAL LOCAL PICKUP SETTINGS ---- */
-        $raw_settings = wp_unslash( (array) $_POST['bt_settings'] ) ?? [];
+        $raw_settings = isset( $_POST['bt_settings'] )
+            ? wp_unslash( (array) $_POST['bt_settings'] )
+            : [];
 
         /*
          * Resolve each submitted key against the roles actually registered
@@ -819,8 +824,16 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         ] );
 
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
-        update_option( 'bt_shipping_rules',      $this->sanitize_rule_set( wp_unslash( (array) $_POST['rules'] )      ?? [] ) );
-        update_option( 'bt_shipping_role_rules', $this->sanitize_rule_set( wp_unslash( (array) $_POST['role_rules'] ) ?? [] ) );
+        update_option( 'bt_shipping_rules',
+            $this->sanitize_rule_set(
+                isset( $_POST['rules'] ) ? wp_unslash( (array) $_POST['rules'] ) : []
+            )
+        );
+        update_option( 'bt_shipping_role_rules',
+            $this->sanitize_rule_set(
+                isset( $_POST['role_rules'] ) ? wp_unslash( (array) $_POST['role_rules'] ) : []
+            )
+        );
 
         // Clear WooCommerce shipping cache
         WC_Cache_Helper::get_transient_version( 'shipping', true );

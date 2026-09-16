@@ -6,16 +6,14 @@
  * Version:           1.4.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
- * Tested up to:      6.6
+ * Tested up to:      7.1
  * WC requires at least: 8.0
  * WC tested up to:    9.3
  * Author:            Braxton Moody
  * Author URI:        https://techtankholdings.com/
  * License:           GPL-2.0+
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       bt-shipping
- * Domain Path:       /languages
- *
+ * Text Domain:       product-category-shipping
  * Copyright 2026 Braxton Moody / TechTank Holdings, Inc.
  */
 
