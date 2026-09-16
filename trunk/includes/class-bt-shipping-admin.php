@@ -825,18 +825,13 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         ] );
 
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-        update_option( 'bt_shipping_rules',
-            $this->sanitize_rule_set(
-                isset( $_POST['rules'] ) ? (array) $_POST['rules'] : []  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-            )
-        );
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-        update_option( 'bt_shipping_role_rules',
-            $this->sanitize_rule_set(
-                isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : []  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-            )
-        );
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+        $bt_rules_input = isset( $_POST['rules'] ) ? (array) $_POST['rules'] : [];
+        update_option( 'bt_shipping_rules', $this->sanitize_rule_set( $bt_rules_input ) );
+
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+        $bt_role_rules_input = isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : [];
+        update_option( 'bt_shipping_role_rules', $this->sanitize_rule_set( $bt_role_rules_input ) );
 
         // Clear WooCommerce shipping cache
         WC_Cache_Helper::get_transient_version( 'shipping', true );
