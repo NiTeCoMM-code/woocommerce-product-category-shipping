@@ -74,6 +74,7 @@ The plugin loads its own text domain. Translation files (.po/.mo) can be placed 
 1. Default Shipping Rules — green cards, one per managed category.
 2. Selected-Role Override Rules — red cards, inert until roles are configured.
 3. Local Pickup & User Roles — role picker, labels, diagnostics table.
+4. Category rule configuration — flat rate or tiered quantity settings per category.
 
 == Changelog ==
 
