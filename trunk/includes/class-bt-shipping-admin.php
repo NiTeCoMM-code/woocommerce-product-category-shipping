@@ -786,18 +786,17 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
      * SAVE HANDLER
      * ------------------------------------------------------------------ */
     public function save_rules() {
+        $bt_nonce = isset( $_POST['bt_nonce'] ) ? wp_unslash( $_POST['bt_nonce'] ) : '';
         if (
-            ! isset( $_POST['bt_nonce'] ) ||
-            ! wp_verify_nonce( wp_unslash( (string) ( $_POST['bt_nonce'] ?? '' ) ), 'bt_shipping_save' ) ||
+            ! wp_verify_nonce( $bt_nonce, 'bt_shipping_save' ) ||
             ! current_user_can( 'manage_woocommerce' )
         ) {
             wp_die( 'Unauthorized', 403 );
         }
 
         /* ---- GLOBAL LOCAL PICKUP SETTINGS ---- */
-        $raw_settings = isset( $_POST['bt_settings'] )
-            ? wp_unslash( (array) $_POST['bt_settings'] )
-            : [];
+        $bt_post_settings = isset( $_POST['bt_settings'] ) ? $_POST['bt_settings'] : [];
+        $raw_settings     = wp_unslash( (array) $bt_post_settings );
 
         /*
          * Resolve each submitted key against the roles actually registered
@@ -826,12 +825,12 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
         update_option( 'bt_shipping_rules',
             $this->sanitize_rule_set(
-                isset( $_POST['rules'] ) ? wp_unslash( (array) $_POST['rules'] ) : []
+                isset( $_POST['rules'] ) ? (array) $_POST['rules'] : []
             )
         );
         update_option( 'bt_shipping_role_rules',
             $this->sanitize_rule_set(
-                isset( $_POST['role_rules'] ) ? wp_unslash( (array) $_POST['role_rules'] ) : []
+                isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : []
             )
         );
 
