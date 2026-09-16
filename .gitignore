@@ -1,0 +1,33 @@
+# Dependencies
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.zip
+*.tar.gz
+node_modules/
+
+# WordPress
+/wp-content/
+
+# WP-CLI
+wp-cli.local.yml
+
+# PHP error logs
+*.log
+php_errors.log
+
+# Composer
+composer.lock
+
+# Test coverage
+.phpunit.result.cache
+coverage/

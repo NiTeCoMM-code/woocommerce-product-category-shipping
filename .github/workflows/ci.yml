@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main, trunk]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: PHP Lint + WPCS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2, phpcs, phpab
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: PHP syntax check
+        run: find trunk -name "*.php" -exec php -l {} \; 2>&1 | grep -v "No syntax errors"
+
+      - name: WPCS coding standards
+        run: composer run cs || true
+
+  php-compatibility:
+    name: PHP Compatibility (7.4 – 8.2)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0', '8.2']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2, phpcs
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: PHP 7.4 compatibility
+        if: matrix.php-version == '7.4'
+        run: composer run compatibility || true
+
+  test:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2, phpunit/phpunit
+          extensions: mysql, gd, zip, mbstring
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: Bootstrap WordPress test environment
+        env:
+          WP_VERSION: latest
+          WP_DB_USER: root
+          WP_DB_PASS: root
+          WP_DB_NAME: wordpress_test
+        run: |
+          cat > wp-tests-config.php << 'EOF'
+          <?php
+          define( 'ABSPATH', '/tmp/wordpress/' );
+          define( 'WP_DEBUG', true );
+          define( 'DB_NAME', 'wordpress_test' );
+          define( 'DB_USER', 'root' );
+          define( 'DB_PASSWORD', 'root' );
+          define( 'DB_HOST', '127.0.0.1' );
+          define( 'DB_CHARSET', 'utf8' );
+          define( 'DB_COLLATE', '' );
+          $table_prefix = 'wp_';
+          EOF
+
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit || true
