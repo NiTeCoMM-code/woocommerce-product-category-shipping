@@ -237,14 +237,13 @@ add_action( 'woocommerce_checkout_create_order', function ( $order ) {
  *    a stale transient version can show the wrong options right after
  *    a role change or login.
  * ------------------------------------------------------------- */
-foreach ( [ 'set_user_role', 'add_user_role', 'remove_user_role', 'wp_login', 'wp_logout' ] as $bt_hook ) {
-    add_action( $bt_hook, function () {
+foreach ( [ 'set_user_role', 'add_user_role', 'remove_user_role', 'wp_login', 'wp_logout' ] as $_shipping_clear_hook ) {
+    add_action( $_shipping_clear_hook, function () {
         if ( class_exists( 'WC_Cache_Helper' ) ) {
             WC_Cache_Helper::get_transient_version( 'shipping', true );
         }
     } );
 }
-unset( $bt_hook );
 
 /* ---------------------------------------------------------------
  * 7. ACTIVATION DEFAULTS
