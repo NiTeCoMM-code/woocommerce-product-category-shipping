@@ -27,8 +27,8 @@ class BT_Shipping_Admin {
     public function add_menu() {
         add_submenu_page(
             'woocommerce',
-            __( 'Category Shipping Rules', 'bt-shipping' ),
-            __( 'Category Shipping', 'bt-shipping' ),
+            __( 'Category Shipping Rules', 'product-category-shipping' ),
+            __( 'Category Shipping', 'product-category-shipping' ),
             'manage_woocommerce',
             'bt-shipping-rules',
             [ $this, 'render_page' ]
@@ -213,7 +213,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         $message    = '';
 
         if ( isset( $_GET['bt_saved'] ) ) {
-            $message = $_GET['bt_saved'] === '1'
+            $message = esc_html( $_GET['bt_saved'] ) === '1'
                 ? '<div class="bt-notice success">✓ Shipping rules saved successfully.</div>'
                 : '<div class="bt-notice">Something went wrong. Please try again.</div>';
         }
@@ -301,7 +301,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
             </template>
         </div>
         <?php
-        echo ob_get_clean();
+        echo esc_html( ob_get_clean() );
     }
 
     /* ------------------------------------------------------------------
@@ -317,7 +317,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <?php
                 echo $names
                     ? esc_html( implode( ', ', $names ) )
-                    : esc_html__( 'No roles selected yet — these rules are inactive', 'bt-shipping' );
+                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping' );
                 ?>
             </span>
         </h2>
@@ -382,7 +382,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
             </div>
             <div class="bt-rule-body">
 
-                <label style="margin-top:0;"><?php _e( 'Roles that get the Local Pickup option', 'bt-shipping' ); ?></label>
+                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping' ); ?></label>
                 <select class="bt-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
                     <?php foreach ( $roles as $key => $display ) : ?>
                         <option value="<?php echo esc_attr( $key ); ?>"
@@ -428,13 +428,13 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
 
                 <div class="bt-row" style="margin-top:20px;">
                     <div>
-                        <label style="margin-top:0;"><?php _e( 'Pickup label', 'bt-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping' ); ?></label>
                         <input type="text" name="bt_settings[pickup_label]"
                                value="<?php echo esc_attr( $pickup_label ); ?>"
                                placeholder="Local Pickup">
                     </div>
                     <div>
-                        <label style="margin-top:0;"><?php _e( 'Combined shipping label', 'bt-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping' ); ?></label>
                         <input type="text" name="bt_settings[combined_label]"
                                value="<?php echo esc_attr( $combined_label ); ?>"
                                placeholder="Shipping">
@@ -442,7 +442,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     </div>
                 </div>
 
-                <label><?php _e( 'Pickup note (optional)', 'bt-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping' ); ?></label>
                 <input type="text" name="bt_settings[pickup_note]"
                        value="<?php echo esc_attr( $pickup_note ); ?>"
                        placeholder="e.g. 1234 Main St — Mon–Fri 9am–5pm">
@@ -485,14 +485,14 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <?php endif; ?>
 
                 <div class="bt-tiers-wrap" style="margin-top:26px;">
-                    <h4><?php _e( 'Diagnostics — what each role actually gets', 'bt-shipping' ); ?></h4>
+                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping' ); ?></h4>
                     <table class="bt-tier-table">
                         <thead>
                             <tr>
-                                <th><?php _e( 'Role', 'bt-shipping' ); ?></th>
-                                <th><?php _e( 'Role key (what is matched)', 'bt-shipping' ); ?></th>
-                                <th><?php _e( 'Users', 'bt-shipping' ); ?></th>
-                                <th><?php _e( 'Checkout behaviour', 'bt-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Role', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Users', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -576,7 +576,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
             </div>
             <div class="bt-rule-body">
 
-                <label><?php _e( 'Product Category', 'bt-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Product Category', 'product-category-shipping' ); ?></label>
                 <select name="<?php echo esc_attr( $base ); ?>[category_slug]"
                         onchange="btUpdateHeader(this)">
                     <option value="">— Select a category —</option>
@@ -588,7 +588,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     <?php endforeach; ?>
                 </select>
 
-                <label><?php _e( 'Shipping Label (shown to customer)', 'bt-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping' ); ?></label>
                 <input type="text" name="<?php echo esc_attr( $base ); ?>[label]"
                        value="<?php echo esc_attr( $label ); ?>"
                        placeholder="e.g. Shipping">
@@ -601,7 +601,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     <?php endif; ?>
                 </p>
 
-                <label style="margin-top:16px;"><?php _e( 'Rule Type', 'bt-shipping' ); ?></label>
+                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping' ); ?></label>
                 <div class="bt-type-selector">
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
@@ -623,7 +623,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <div class="bt-flat-section" style="<?php echo $type !== 'flat' ? 'display:none;' : ''; ?>">
                     <div class="bt-row">
                         <div>
-                            <label><?php _e( 'Base Shipping Price ($)', 'bt-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_price]"
                                    value="<?php echo esc_attr( $flat_price ); ?>"
@@ -631,7 +631,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                             <p style="margin:2px 0 0;font-size:.78rem;color:#888;">Charged for the first item.</p>
                         </div>
                         <div>
-                            <label><?php _e( 'Additional Item Price ($)', 'bt-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_additional]"
                                    value="<?php echo esc_attr( $flat_additional ); ?>"
@@ -785,14 +785,14 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
     public function save_rules() {
         if (
             ! isset( $_POST['bt_nonce'] ) ||
-            ! wp_verify_nonce( $_POST['bt_nonce'], 'bt_shipping_save' ) ||
+            ! wp_verify_nonce( wp_unslash( $_POST['bt_nonce'] ), 'bt_shipping_save' ) ||
             ! current_user_can( 'manage_woocommerce' )
         ) {
             wp_die( 'Unauthorized', 403 );
         }
 
         /* ---- GLOBAL LOCAL PICKUP SETTINGS ---- */
-        $raw_settings = $_POST['bt_settings'] ?? [];
+        $raw_settings = wp_unslash( (array) $_POST['bt_settings'] ) ?? [];
 
         /*
          * Resolve each submitted key against the roles actually registered
@@ -819,8 +819,8 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         ] );
 
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
-        update_option( 'bt_shipping_rules',      $this->sanitize_rule_set( $_POST['rules']      ?? [] ) );
-        update_option( 'bt_shipping_role_rules', $this->sanitize_rule_set( $_POST['role_rules'] ?? [] ) );
+        update_option( 'bt_shipping_rules',      $this->sanitize_rule_set( wp_unslash( (array) $_POST['rules'] )      ?? [] ) );
+        update_option( 'bt_shipping_role_rules', $this->sanitize_rule_set( wp_unslash( (array) $_POST['role_rules'] ) ?? [] ) );
 
         // Clear WooCommerce shipping cache
         WC_Cache_Helper::get_transient_version( 'shipping', true );

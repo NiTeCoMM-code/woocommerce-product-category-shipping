@@ -93,12 +93,3 @@ add_action( 'plugins_loaded', function () {
  * ------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------
- * 5. TRANSLATION
- * ------------------------------------------------------------- */
-add_action( 'init', function () {
-	load_plugin_textdomain(
-		'bt-shipping',
-		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages'
-	);
-} );

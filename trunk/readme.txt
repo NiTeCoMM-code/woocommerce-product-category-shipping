@@ -4,14 +4,14 @@ Donate link:       https://techtankholdings.com/
 Tags:              woocommerce, shipping, category, flat rate, tiered shipping
 Requires at least: 6.4
 Requires PHP:      7.4
-Tested up to:      6.6
+Tested up to:      7.1
 WC requires at least: 8.0
 WC tested up to:   9.3
 Stable tag:        1.4.0
 License:           GPL-2.0+
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-WooCommerce shipping that charges per product category — flat rate or tiered quantity — with an optional cart-wide Free Local Pickup for selected user roles.
+WooCommerce shipping per product category — flat rate or tiered-quantity rules, plus Free Local Pickup for selected roles.
 
 == Description ==
 
@@ -80,7 +80,7 @@ The plugin loads its own text domain. Translation files (.po/.mo) can be placed 
 
 = 1.4.0 =
 * Rebranded to "Product Category Shipping for WooCommerce"
-* Updated header fields for WordPress.org compatibility (Tested up to 6.6, WC 9.3)
+* Updated header fields for WordPress.org compatibility (Tested up to 7.1, WC 9.3)
 * Added `Requires at least`, `Requires PHP`, `WC requires at least`, `WC tested up to` header fields
 * Added translation infrastructure (`load_plugin_textdomain`, languages directory)
 * Internal: renamed main plugin file; no functional changes

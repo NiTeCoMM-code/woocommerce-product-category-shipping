@@ -20,8 +20,8 @@ class BT_Shipping_Method extends WC_Shipping_Method {
     public function __construct( $instance_id = 0 ) {
         $this->id                 = 'bt_category_shipping';
         $this->instance_id        = absint( $instance_id );
-        $this->method_title       = __( 'Category Shipping', 'bt-shipping' );
-        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'bt-shipping' );
+        $this->method_title       = __( 'Category Shipping', 'product-category-shipping' );
+        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping' );
         $this->supports           = [ 'shipping-zones', 'instance-settings' ];
         $this->enabled            = 'yes';
         $this->title              = $this->method_title;
@@ -139,7 +139,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
                 continue;
             }
 
-            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'bt-shipping' );
+            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping' );
             $taxable    = ! empty( $rule['taxable'] ) && '1' === $rule['taxable'];
             $tax_status = $taxable ? 'taxable' : 'none';
             $suffix     = ( 'flat' === $amount['type'] ) ? '_flat' : '_tier';
@@ -148,7 +148,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
                 // Rule index is part of the ID as of 1.2.0 so two rules on the
                 // same category no longer overwrite each other's rate.
                 'id'         => $this->bt_get_rate_id( $idx . '_' . $slug . $suffix ),
-                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'bt-shipping' ),
+                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping' ),
                 'cost'       => $amount['price'],
                 'tax_status' => $tax_status,
                 'meta_data'  => [ 'bt_category' => $slug ],
@@ -223,11 +223,11 @@ class BT_Shipping_Method extends WC_Shipping_Method {
         if ( $matched_any ) {
             $combined_label = ! empty( $settings['combined_label'] )
                 ? $settings['combined_label']
-                : __( 'Shipping', 'bt-shipping' );
+                : __( 'Shipping', 'product-category-shipping' );
 
             $this->add_rate( [
                 'id'         => $this->bt_get_rate_id( 'combined' ),
-                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'bt-shipping' ),
+                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping' ),
                 'cost'       => $total,
                 'tax_status' => $tax_status,
                 'meta_data'  => [ 'bt_mode' => 'combined' ],
@@ -242,7 +242,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
          */
         $pickup_label = ! empty( $settings['pickup_label'] )
             ? $settings['pickup_label']
-            : __( 'Local Pickup', 'bt-shipping' );
+            : __( 'Local Pickup', 'product-category-shipping' );
 
         if ( ! empty( $settings['pickup_note'] ) ) {
             $pickup_label .= ' — ' . $settings['pickup_note'];
