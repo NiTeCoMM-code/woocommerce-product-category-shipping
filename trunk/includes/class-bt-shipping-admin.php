@@ -788,7 +788,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
     public function save_rules() {
         if (
             ! isset( $_POST['bt_nonce'] ) ||
-            ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['bt_nonce'] ) ), 'bt_shipping_save' ) ||
+            ! wp_verify_nonce( wp_unslash( (string) ( $_POST['bt_nonce'] ?? '' ) ), 'bt_shipping_save' ) ||
             ! current_user_can( 'manage_woocommerce' )
         ) {
             wp_die( 'Unauthorized', 403 );
