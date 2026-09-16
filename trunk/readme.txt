@@ -1,5 +1,5 @@
 === Product Category Shipping for WooCommerce ===
-Contributors:      NiTeCoMM, techtankholdings
+Contributors:      Braxton Moody, techtankholdings
 Donate link:       https://techtankholdings.com/
 Tags:              woocommerce, shipping, category, flat rate, tiered shipping
 Requires at least: 6.4
