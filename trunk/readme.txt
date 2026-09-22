@@ -7,7 +7,7 @@ Requires PHP:      7.4
 Tested up to:      7.1
 WC requires at least: 8.0
 WC tested up to:   9.3
-Stable tag:        1.4.0
+Stable tag:        1.4.1
 License:           GPL-2.0+
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,7 +78,18 @@ The plugin loads its own text domain. Translation files (.po/.mo) can be placed 
 
 == Changelog ==
 
+= 1.4.1 =
+* Post-review fixes: changed text domain to product-category-shipping-for-woocommerce;
+  replaced inline CSS/JS with wp_enqueue_style/script + external admin.css/admin.js;
+  removed Tested up to from PHP header; added Requires Plugins header;
+  removed WordPress.org assets from plugin zip
+
 = 1.4.0 =
+* Rebranded: changed text domain to product-category-shipping-for-woocommerce;
+  replaced inline CSS/JS with wp_enqueue_style/script + external admin.css/admin.js;
+  removed Tested up to from PHP header; added Requires Plugins header;
+  removed WordPress.org assets from plugin zip
+
 * Rebranded to "Product Category Shipping for WooCommerce"
 * Updated header fields for WordPress.org compatibility (Tested up to 7.1, WC 9.3)
 * Added `Requires at least`, `Requires PHP`, `WC requires at least`, `WC tested up to` header fields
@@ -102,6 +113,9 @@ The plugin loads its own text domain. Translation files (.po/.mo) can be placed 
 * Per-category rules, cart split, admin settings page.
 
 == Upgrade Notice ==
+
+= 1.4.1 =
+* Post-review fixes for WordPress.org plugin review. No behaviour changes.
 
 = 1.4.0 =
 Mandatory update for WordPress.org distribution. No behaviour changes from 1.3.0.

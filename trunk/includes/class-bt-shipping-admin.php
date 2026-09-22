@@ -27,8 +27,8 @@ class BT_Shipping_Admin {
     public function add_menu() {
         add_submenu_page(
             'woocommerce',
-            __( 'Category Shipping Rules', 'product-category-shipping' ),
-            __( 'Category Shipping', 'product-category-shipping' ),
+            __( 'Category Shipping Rules', 'product-category-shipping-for-woocommerce' ),
+            __( 'Category Shipping', 'product-category-shipping-for-woocommerce' ),
             'manage_woocommerce',
             'bt-shipping-rules',
             [ $this, 'render_page' ]
@@ -42,166 +42,20 @@ class BT_Shipping_Admin {
         if ( $hook !== 'woocommerce_page_bt-shipping-rules' ) {
             return;
         }
-        // Inline CSS + JS — no external files needed
-        add_action( 'admin_head', [ $this, 'inline_styles' ] );
-        add_action( 'admin_footer', [ $this, 'inline_scripts' ] );
+        wp_enqueue_style(
+            'bt-shipping-admin',
+            BT_SHIPPING_URL . 'admin.css',
+            [],
+            BT_SHIPPING_VERSION
+        );
+        wp_enqueue_script(
+            'bt-shipping-admin',
+            BT_SHIPPING_URL . 'admin.js',
+            [],
+            BT_SHIPPING_VERSION,
+            true
+        );
     }
-
-    public function inline_styles() { ?>
-<style>
-/* ===== Category Shipping Admin Styles ===== */
-:root {
-    --bt-red:    #dd291e;
-    --bt-yellow: #fce122;
-    --bt-green:  #235937;
-    --bt-light:  #fafafa;
-    --bt-border: #ddd;
-    --bt-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-#bt-shipping-wrap { max-width: 900px; margin: 24px 0; font-family: -apple-system,sans-serif; }
-#bt-shipping-wrap h1 { display:flex; align-items:center; gap:12px; font-size:1.5rem; color:#1d2327; margin-bottom:4px; }
-#bt-shipping-wrap h1 span.bt-badge {
-    background:var(--bt-red); color:#fff; font-size:.65rem;
-    padding:2px 8px; border-radius:99px; font-weight:700; letter-spacing:.05em; vertical-align:middle;
-}
-.bt-desc { color:#666; margin-bottom:28px; font-size:.9rem; }
-
-/* Cards */
-.bt-rule-card {
-    background:#fff; border:1px solid var(--bt-border); border-radius:8px;
-    box-shadow:var(--bt-shadow); margin-bottom:20px; overflow:hidden;
-}
-.bt-rule-header {
-    display:flex; align-items:center; justify-content:space-between;
-    background:var(--bt-green); color:#fff; padding:12px 18px; cursor:pointer;
-}
-.bt-rule-header h3 { margin:0; font-size:.95rem; font-weight:600; }
-.bt-rule-header .bt-rule-type-badge {
-    font-size:.7rem; background:rgba(255,255,255,.2); padding:2px 10px;
-    border-radius:99px; margin-left:10px; font-weight:600; letter-spacing:.04em;
-}
-.bt-rule-body { padding:20px 24px; }
-.bt-rule-body label { display:block; font-weight:600; font-size:.82rem; color:#444; margin-bottom:4px; margin-top:14px; }
-.bt-rule-body label:first-child { margin-top:0; }
-.bt-rule-body input[type=text],
-.bt-rule-body input[type=number],
-.bt-rule-body select { width:100%; max-width:340px; padding:7px 10px; border:1px solid var(--bt-border); border-radius:5px; font-size:.9rem; }
-.bt-rule-body .bt-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.bt-rule-body .bt-row > div label { margin-top:0; }
-
-/* Tiers table */
-.bt-tiers-wrap { margin-top:18px; }
-.bt-tiers-wrap h4 { font-size:.85rem; color:#333; margin:0 0 10px; }
-.bt-tier-table { width:100%; border-collapse:collapse; font-size:.85rem; }
-.bt-tier-table th { background:#f5f5f5; text-align:left; padding:7px 10px; border:1px solid #e0e0e0; font-weight:600; color:#555; }
-.bt-tier-table td { padding:6px 8px; border:1px solid #e8e8e8; vertical-align:middle; }
-.bt-tier-table input[type=number] { width:80px; max-width:80px; padding:4px 6px; font-size:.85rem; }
-.bt-tier-table input[type=checkbox] { width:18px; height:18px; cursor:pointer; }
-.bt-tier-table .bt-free-price { color:#aaa; font-style:italic; font-size:.8rem; }
-.bt-add-tier { margin-top:8px; background:none; border:1px dashed var(--bt-green); color:var(--bt-green);
-    padding:5px 14px; border-radius:5px; cursor:pointer; font-size:.82rem; font-weight:600; }
-.bt-add-tier:hover { background:var(--bt-green); color:#fff; }
-.bt-remove-tier { background:none; border:none; color:#c00; cursor:pointer; font-size:1.1rem; line-height:1; padding:0 4px; }
-.bt-remove-tier:hover { color:#900; }
-
-/* Rule actions */
-.bt-rule-footer { display:flex; justify-content:flex-end; padding:10px 24px 14px; border-top:1px solid #f0f0f0; }
-.bt-remove-rule { background:none; border:1px solid #c00; color:#c00; padding:5px 14px; border-radius:5px; cursor:pointer; font-size:.82rem; font-weight:600; }
-.bt-remove-rule:hover { background:#c00; color:#fff; }
-
-/* Add rule button */
-#bt-add-rule {
-    background:var(--bt-yellow); color:#1d2327; border:none; padding:10px 22px;
-    border-radius:6px; font-weight:700; font-size:.9rem; cursor:pointer; margin-bottom:24px;
-    box-shadow:0 2px 6px rgba(0,0,0,.1);
-}
-#bt-add-rule:hover { background:#e8ce00; }
-
-/* Save button */
-.bt-save-bar {
-    background:#fff; border:1px solid var(--bt-border); border-radius:8px;
-    padding:16px 24px; display:flex; align-items:center; gap:16px;
-    box-shadow:var(--bt-shadow);
-}
-.bt-save-bar input[type=submit] {
-    background:var(--bt-red); color:#fff; border:none; padding:10px 28px;
-    border-radius:6px; font-size:.95rem; font-weight:700; cursor:pointer;
-}
-.bt-save-bar input[type=submit]:hover { background:#b5201a; }
-.bt-save-bar .bt-saved-msg { color:var(--bt-green); font-weight:600; font-size:.9rem; display:none; }
-
-/* Notices */
-.bt-notice { border-left:4px solid var(--bt-red); background:#fff8f8; padding:10px 14px; margin-bottom:16px; border-radius:4px; font-size:.88rem; }
-.bt-notice.success { border-color:var(--bt-green); background:#f0fff4; }
-
-/* Toggle */
-.bt-toggle-row { display:flex; align-items:center; gap:10px; margin-top:14px; }
-.bt-toggle-row label { margin:0; font-size:.88rem; color:#555; font-weight:400; }
-input[type=checkbox].bt-toggle { width:18px; height:18px; }
-
-/* Rule type selector */
-.bt-type-selector { display:flex; gap:10px; margin-top:6px; }
-.bt-type-selector label {
-    flex:1; border:2px solid var(--bt-border); border-radius:7px; padding:10px 14px;
-    cursor:pointer; text-align:center; font-weight:600; font-size:.85rem; color:#555;
-    transition: all .15s;
-}
-.bt-type-selector input[type=radio] { display:none; }
-.bt-type-selector input[type=radio]:checked + label {
-    border-color:var(--bt-green); background:#f0fff4; color:var(--bt-green);
-}
-
-/* ===== v1.2.0: local pickup roles ===== */
-.bt-role-select {
-    width:100% !important; max-width:340px; min-height:112px;
-    padding:6px !important; border:1px solid var(--bt-border); border-radius:5px;
-    font-size:.85rem; background:#fff;
-}
-.bt-role-select option { padding:3px 6px; border-radius:3px; }
-.bt-role-select option:checked { background:var(--bt-green) linear-gradient(0deg,var(--bt-green),var(--bt-green)); color:#fff; }
-.bt-hint { margin:5px 0 0; font-size:.78rem; color:#888; line-height:1.5; max-width:560px; }
-.bt-hint strong { color:#555; }
-
-#bt-pickup-card { border-left:4px solid var(--bt-yellow); }
-#bt-pickup-card .bt-rule-header { background:#1d2327; }
-
-.bt-callout {
-    background:#f7fbff; border:1px solid #cfe3f5; border-radius:6px;
-    padding:12px 16px; margin-top:16px; font-size:.82rem; color:#31536e; line-height:1.6; max-width:600px;
-}
-.bt-callout strong { color:#1d3d5c; }
-.bt-callout.warn { background:#fffdf3; border-color:#f0dca0; color:#6b5400; }
-.bt-callout.warn strong { color:#4d3d00; }
-.bt-callout ul { margin:8px 0 0 18px; padding:0; }
-.bt-callout li { margin:3px 0; }
-
-.bt-status-pill {
-    display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.04em;
-    padding:3px 10px; border-radius:99px; margin-left:10px;
-}
-.bt-status-pill.on  { background:#d8f3e0; color:var(--bt-green); }
-.bt-status-pill.off { background:#eee;    color:#777; }
-
-/* ===== v1.3.0: selected-role override rule set ===== */
-.bt-section-head {
-    display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
-    font-size:1.05rem; font-weight:700; color:#1d2327;
-    margin:34px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--bt-green);
-}
-.bt-section-head.role { border-bottom-color:var(--bt-red); margin-top:42px; }
-.bt-section-sub { font-size:.78rem; font-weight:600; color:#777; letter-spacing:.02em; }
-
-/* Override cards read red so they are never confused with the defaults */
-#bt-role-rules-container .bt-rule-header { background:var(--bt-red); }
-#bt-role-rules-container .bt-add-tier { border-color:var(--bt-red); color:var(--bt-red); }
-#bt-role-rules-container .bt-add-tier:hover { background:var(--bt-red); color:#fff; }
-#bt-role-rules-container .bt-type-selector input[type=radio]:checked + label {
-    border-color:var(--bt-red); background:#fff5f4; color:var(--bt-red);
-}
-button.bt-add-role { background:#f3d2cf !important; }
-button.bt-add-role:hover { background:#e9b8b4 !important; }
-</style>
-<?php }
 
     /* ------------------------------------------------------------------
      * RENDER PAGE
@@ -320,7 +174,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <?php
                 echo $names
                     ? esc_html( implode( ', ', $names ) )
-                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping' );
+                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping-for-woocommerce' );
                 ?>
             </span>
         </h2>
@@ -385,7 +239,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
             </div>
             <div class="bt-rule-body">
 
-                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping' ); ?></label>
+                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <select class="bt-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
                     <?php foreach ( $roles as $key => $display ) : ?>
                         <option value="<?php echo esc_attr( $key ); ?>"
@@ -431,13 +285,13 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
 
                 <div class="bt-row" style="margin-top:20px;">
                     <div>
-                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping-for-woocommerce' ); ?></label>
                         <input type="text" name="bt_settings[pickup_label]"
                                value="<?php echo esc_attr( $pickup_label ); ?>"
                                placeholder="Local Pickup">
                     </div>
                     <div>
-                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping-for-woocommerce' ); ?></label>
                         <input type="text" name="bt_settings[combined_label]"
                                value="<?php echo esc_attr( $combined_label ); ?>"
                                placeholder="Shipping">
@@ -445,7 +299,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     </div>
                 </div>
 
-                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <input type="text" name="bt_settings[pickup_note]"
                        value="<?php echo esc_attr( $pickup_note ); ?>"
                        placeholder="e.g. 1234 Main St — Mon–Fri 9am–5pm">
@@ -488,14 +342,14 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <?php endif; ?>
 
                 <div class="bt-tiers-wrap" style="margin-top:26px;">
-                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping' ); ?></h4>
+                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping-for-woocommerce' ); ?></h4>
                     <table class="bt-tier-table">
                         <thead>
                             <tr>
-                                <th><?php esc_html_e( 'Role', 'product-category-shipping' ); ?></th>
-                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping' ); ?></th>
-                                <th><?php esc_html_e( 'Users', 'product-category-shipping' ); ?></th>
-                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Role', 'product-category-shipping-for-woocommerce' ); ?></th>
+                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping-for-woocommerce' ); ?></th>
+                                <th><?php esc_html_e( 'Users', 'product-category-shipping-for-woocommerce' ); ?></th>
+                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping-for-woocommerce' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -579,7 +433,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
             </div>
             <div class="bt-rule-body">
 
-                <label><?php esc_html_e( 'Product Category', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Product Category', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <select name="<?php echo esc_attr( $base ); ?>[category_slug]"
                         onchange="btUpdateHeader(this)">
                     <option value="">— Select a category —</option>
@@ -591,7 +445,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     <?php endforeach; ?>
                 </select>
 
-                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <input type="text" name="<?php echo esc_attr( $base ); ?>[label]"
                        value="<?php echo esc_attr( $label ); ?>"
                        placeholder="e.g. Shipping">
@@ -604,7 +458,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                     <?php endif; ?>
                 </p>
 
-                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping' ); ?></label>
+                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <div class="bt-type-selector">
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
@@ -626,7 +480,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                 <div class="bt-flat-section" style="<?php echo $type !== 'flat' ? 'display:none;' : ''; ?>">
                     <div class="bt-row">
                         <div>
-                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping-for-woocommerce' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_price]"
                                    value="<?php echo esc_attr( $flat_price ); ?>"
@@ -634,7 +488,7 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
                             <p style="margin:2px 0 0;font-size:.78rem;color:#888;">Charged for the first item.</p>
                         </div>
                         <div>
-                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping-for-woocommerce' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_additional]"
                                    value="<?php echo esc_attr( $flat_additional ); ?>"
@@ -842,102 +696,5 @@ button.bt-add-role:hover { background:#e9b8b4 !important; }
         ], admin_url( 'admin.php' ) ) );
         exit;
     }
-
-    /* ------------------------------------------------------------------
-     * INLINE JAVASCRIPT
-     * ------------------------------------------------------------------ */
-    public function inline_scripts() {
-        ?>
-        <script>
-        // ── Card toggle ──────────────────────────────────────────────
-        function btToggleCard(header) {
-            const body = header.nextElementSibling;
-            const footer = body.nextElementSibling;
-            const isHidden = body.style.display === 'none';
-            body.style.display   = isHidden ? '' : 'none';
-            footer.style.display = isHidden ? '' : 'none';
-        }
-
-        // ── Update card header when category changes ─────────────────
-        function btUpdateHeader(select) {
-            const card = select.closest('.bt-rule-card');
-            const h3   = card.querySelector('.bt-rule-header h3');
-            const badge = h3.querySelector('.bt-rule-type-badge');
-            const badgeText = badge ? badge.outerHTML : '';
-            const chosen = select.options[select.selectedIndex].text;
-            h3.innerHTML = (chosen && select.value ? chosen : 'New Rule') + badgeText;
-        }
-
-        // ── Switch between flat / tiered ─────────────────────────────
-        function btSwitchType(radio, type) {
-            const card = radio.closest('.bt-rule-card');
-            card.querySelector('.bt-flat-section').style.display   = type === 'flat'   ? '' : 'none';
-            card.querySelector('.bt-tiered-section').style.display = type === 'tiered' ? '' : 'none';
-            // Update badge
-            const badge = card.querySelector('.bt-rule-type-badge');
-            if (badge) badge.textContent = type === 'flat' ? 'Flat Rate' : 'Tiered';
-        }
-
-        // ── Add a new rule card ───────────────────────────────────────
-        // Both rule sets (default + selected-role override) share this handler.
-        // Each button carries its own container, template and running index.
-        document.querySelectorAll('#bt-add-rule, #bt-add-role-rule').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-            const template = document.getElementById(btn.dataset.template);
-            let count = parseInt(btn.dataset.count || '0', 10);
-            const html = template.innerHTML.replace(/__IDX__/g, count);
-            btn.dataset.count = count + 1;
-            const container = document.getElementById(btn.dataset.container);
-            // Remove "no rules" message if present.
-            // Must be a DIRECT child — rule cards contain their own <p> hints,
-            // and querySelector('p') would happily delete one of those instead.
-            const noRules = container.querySelector(':scope > p');
-            if (noRules) noRules.remove();
-            container.insertAdjacentHTML('beforeend', html);
-            });
-        });
-
-        // ── Remove a rule card ────────────────────────────────────────
-        function btRemoveRule(btn) {
-            if (!confirm('Remove this shipping rule?')) return;
-            btn.closest('.bt-rule-card').remove();
-        }
-
-        // ── Add a tier row ────────────────────────────────────────────
-        // `base` is the full field prefix, e.g. "rules[0]" or "role_rules[2]",
-        // so the same function serves both rule sets.
-        function btAddTier(btn, base) {
-            const tbody = btn.previousElementSibling.querySelector('.bt-tier-tbody');
-            const tierIdx = tbody.querySelectorAll('tr').length;
-            const prefix = `${base}[tiers][${tierIdx}]`;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="number" min="1" name="${prefix}[qty_min]" placeholder="1"></td>
-                <td><input type="number" min="1" name="${prefix}[qty_max]" placeholder="6"></td>
-                <td><input type="number" step="0.01" min="0" name="${prefix}[price]" placeholder="10.20" class="bt-price-input"></td>
-                <td style="text-align:center;">
-                    <input type="checkbox" name="${prefix}[free]" value="1"
-                           class="bt-free-check" onchange="btToggleFree(this)">
-                </td>
-                <td><button type="button" class="bt-remove-tier" onclick="btRemoveTier(this)">✕</button></td>
-            `;
-            tbody.appendChild(row);
-        }
-
-        // ── Remove a tier row ─────────────────────────────────────────
-        function btRemoveTier(btn) {
-            btn.closest('tr').remove();
-        }
-
-        // ── Toggle price field when "Free" is checked ─────────────────
-        function btToggleFree(checkbox) {
-            const row   = checkbox.closest('tr');
-            const price = row.querySelector('.bt-price-input');
-            if (!price) return;
-            price.disabled = checkbox.checked;
-            price.style.opacity = checkbox.checked ? '0.4' : '1';
-        }
-        </script>
-        <?php
-    }
 }
+
