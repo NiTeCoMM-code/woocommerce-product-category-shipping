@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name:       Product Category Shipping for WooCommerce
- * Plugin URI:        https://wordpress.org/plugins/product-category-shipping-v1.4.2/
+ * Plugin URI:        https://wordpress.org/plugins/product-category-shipping/
  * Description:       WooCommerce shipping plugin that charges per product category using flat-rate or tiered-quantity rules. Selected user roles can be offered a cart-wide Free Local Pickup option alongside the configured shipping rates.
  * Version:           1.4.2
  * Author:            Braxton Moody
  * License:           GPL-2.0+
- * Text Domain:       product-category-shipping-v1.4.2
+ * Text Domain:       product-category-shipping
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins: woocommerce
