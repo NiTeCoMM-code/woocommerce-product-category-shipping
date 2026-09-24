@@ -1,6 +1,13 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+/*
+ * TextDomainMismatch suppression: Plugin Check infers the expected text domain
+ * from the plugin folder name on the server. The canonical Text Domain header
+ * is product-category-shipping-for-woocommerce, matching the wordpress.org slug.
+ */
+/* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+
 /**
  * BT_Shipping_Roles
  *

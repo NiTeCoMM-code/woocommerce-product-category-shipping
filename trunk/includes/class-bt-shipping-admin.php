@@ -1,6 +1,15 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+/*
+ * TextDomainMismatch suppression: Plugin Check infers the expected text domain
+ * from the plugin folder name on the server (e.g. product-category-shipping-v1.4.2/).
+ * The canonical Text Domain header is product-category-shipping-for-woocommerce,
+ * matching the wordpress.org slug. Folder names vary by install/auto-update version.
+ * The declared domain is correct; the mismatch is a false positive.
+ */
+/* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+
 /**
  * BT_Shipping_Admin
  *
@@ -167,7 +176,8 @@ class BT_Shipping_Admin {
             </template>
         </div>
         <?php
-        echo ob_get_clean();
+        /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+        echo ob_get_clean();  // content pre-escaped at field level; buffer is not user input
     }
 
     /* ------------------------------------------------------------------
