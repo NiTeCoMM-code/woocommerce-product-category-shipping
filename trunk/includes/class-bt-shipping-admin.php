@@ -158,7 +158,7 @@ class BT_Shipping_Admin {
             </template>
         </div>
         <?php
-        echo esc_html( ob_get_clean() );
+        echo ob_get_clean();
     }
 
     /* ------------------------------------------------------------------

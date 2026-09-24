@@ -7,7 +7,7 @@ Requires PHP:      7.4
 Tested up to:      7.1
 WC requires at least: 8.0
 WC tested up to:   9.3
-Stable tag:        1.4.1
+Stable tag:        1.4.2
 License:           GPL-2.0+
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,15 @@ The plugin loads its own text domain. Translation files (.po/.mo) can be placed 
 4. Category rule configuration — flat rate or tiered quantity settings per category.
 
 == Changelog ==
+
+= 1.4.2 =
+* Fixed: duplicate "Category Shipping" submenu entry appearing under WooCommerce.
+  Root cause: the admin class was instantiated on `plugins_loaded`, which fires on every
+  request and could run twice during WooCommerce's own boot sequence. Changed to
+  `add_action('admin_menu')` at priority 20 so it registers exactly once.
+* Fixed: admin settings page rendering raw HTML markup as plain text. Root cause:
+  `render_page()` passed its buffered output through `esc_html()` before echoing it,
+  converting `<`/`>` to `&lt;`/`&gt;`. Removed the stray `esc_html()` call.
 
 = 1.4.1 =
 * Post-review fixes: changed text domain to product-category-shipping-for-woocommerce;
