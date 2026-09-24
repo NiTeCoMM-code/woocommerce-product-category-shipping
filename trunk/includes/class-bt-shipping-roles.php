@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping-for-woocommerce, matching the wordpress.org slug.
+ * is product-category-shipping-v1.4.2, matching the wordpress.org slug.
  */
 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 
@@ -65,7 +65,7 @@ class BT_Shipping_Roles {
      */
     public static function selectable_roles( $include_extra = [] ) {
         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-        $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping-for-woocommerce' ) ];
+        $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping-v1.4.2' ) ];
 
         if ( function_exists( 'wp_roles' ) ) {
             foreach ( wp_roles()->get_names() as $key => $name ) {
@@ -78,7 +78,7 @@ class BT_Shipping_Roles {
                 /* translators: %s: user role key */
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 $out[ $key ] = /* translators: %s: role key */
-                sprintf( __( '%s (no longer registered)', 'product-category-shipping-for-woocommerce' ), $key );
+                sprintf( __( '%s (no longer registered)', 'product-category-shipping-v1.4.2' ), $key );
             }
         }
 
