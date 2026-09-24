@@ -3,8 +3,8 @@ defined( 'ABSPATH' ) || exit;
 
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
- * from the plugin folder name on the server (e.g. product-category-shipping-v1.4.2/).
- * The canonical Text Domain header is product-category-shipping-v1.4.2,
+ * from the plugin folder name on the server (e.g. product-category-shipping-v1-4-2/).
+ * The canonical Text Domain header is product-category-shipping-v1-4-2,
  * matching the wordpress.org slug. Folder names vary by install/auto-update version.
  * The declared domain is correct; the mismatch is a false positive.
  */
@@ -46,8 +46,8 @@ class BT_Shipping_Admin {
         add_submenu_page(
             'woocommerce',
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            __( 'Category Shipping Rules', 'product-category-shipping-v1.4.2' ),
-            __( 'Category Shipping', 'product-category-shipping-v1.4.2' ),
+            __( 'Category Shipping Rules', 'product-category-shipping-v1-4-2' ),
+            __( 'Category Shipping', 'product-category-shipping-v1-4-2' ),
             'manage_woocommerce',
             'bt-shipping-rules',
             [ $this, 'render_page' ]
@@ -195,7 +195,7 @@ class BT_Shipping_Admin {
                 echo $names
                     ? esc_html( implode( ', ', $names ) )
                     /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping-v1.4.2' );
+                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping-v1-4-2' );
                 ?>
             </span>
         </h2>
@@ -261,7 +261,7 @@ class BT_Shipping_Admin {
             <div class="bt-rule-body">
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping-v1.4.2' ); ?></label>
+                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping-v1-4-2' ); ?></label>
                 <select class="bt-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
                     <?php foreach ( $roles as $key => $display ) : ?>
                         <option value="<?php echo esc_attr( $key ); ?>"
@@ -308,14 +308,14 @@ class BT_Shipping_Admin {
                 <div class="bt-row" style="margin-top:20px;">
                     <div>
                         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping-v1.4.2' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping-v1-4-2' ); ?></label>
                         <input type="text" name="bt_settings[pickup_label]"
                                value="<?php echo esc_attr( $pickup_label ); ?>"
                                placeholder="Local Pickup">
                     </div>
                     <div>
                         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping-v1.4.2' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping-v1-4-2' ); ?></label>
                         <input type="text" name="bt_settings[combined_label]"
                                value="<?php echo esc_attr( $combined_label ); ?>"
                                placeholder="Shipping">
@@ -324,7 +324,7 @@ class BT_Shipping_Admin {
                 </div>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping-v1.4.2' ); ?></label>
+                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping-v1-4-2' ); ?></label>
                 <input type="text" name="bt_settings[pickup_note]"
                        value="<?php echo esc_attr( $pickup_note ); ?>"
                        placeholder="e.g. 1234 Main St — Mon–Fri 9am–5pm">
@@ -368,16 +368,16 @@ class BT_Shipping_Admin {
 
                 <div class="bt-tiers-wrap" style="margin-top:26px;">
                     /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping-v1.4.2' ); ?></h4>
+                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping-v1-4-2' ); ?></h4>
                     <table class="bt-tier-table">
                         <thead>
                             <tr>
                                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                                <th><?php esc_html_e( 'Role', 'product-category-shipping-v1.4.2' ); ?></th>
-                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping-v1.4.2' ); ?></th>
-                                <th><?php esc_html_e( 'Users', 'product-category-shipping-v1.4.2' ); ?></th>
+                                <th><?php esc_html_e( 'Role', 'product-category-shipping-v1-4-2' ); ?></th>
+                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping-v1-4-2' ); ?></th>
+                                <th><?php esc_html_e( 'Users', 'product-category-shipping-v1-4-2' ); ?></th>
                                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping-v1.4.2' ); ?></th>
+                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping-v1-4-2' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -462,7 +462,7 @@ class BT_Shipping_Admin {
             <div class="bt-rule-body">
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Product Category', 'product-category-shipping-v1.4.2' ); ?></label>
+                <label><?php esc_html_e( 'Product Category', 'product-category-shipping-v1-4-2' ); ?></label>
                 <select name="<?php echo esc_attr( $base ); ?>[category_slug]"
                         onchange="btUpdateHeader(this)">
                     <option value="">— Select a category —</option>
@@ -475,7 +475,7 @@ class BT_Shipping_Admin {
                 </select>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping-v1.4.2' ); ?></label>
+                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping-v1-4-2' ); ?></label>
                 <input type="text" name="<?php echo esc_attr( $base ); ?>[label]"
                        value="<?php echo esc_attr( $label ); ?>"
                        placeholder="e.g. Shipping">
@@ -489,7 +489,7 @@ class BT_Shipping_Admin {
                 </p>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping-v1.4.2' ); ?></label>
+                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping-v1-4-2' ); ?></label>
                 <div class="bt-type-selector">
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
@@ -512,7 +512,7 @@ class BT_Shipping_Admin {
                     <div class="bt-row">
                         <div>
                             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping-v1.4.2' ); ?></label>
+                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping-v1-4-2' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_price]"
                                    value="<?php echo esc_attr( $flat_price ); ?>"
@@ -521,7 +521,7 @@ class BT_Shipping_Admin {
                         </div>
                         <div>
                             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping-v1.4.2' ); ?></label>
+                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping-v1-4-2' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_additional]"
                                    value="<?php echo esc_attr( $flat_additional ); ?>"
