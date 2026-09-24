@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping-v1.4.2, matching the wordpress.org slug.
+ * is product-category-shipping-for-woocommerce, matching the wordpress.org slug.
  */
 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 
@@ -28,8 +28,8 @@ class BT_Shipping_Method extends WC_Shipping_Method {
         $this->id                 = 'bt_category_shipping';
         $this->instance_id        = absint( $instance_id );
         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-        $this->method_title       = __( 'Category Shipping', 'product-category-shipping-v1.4.2' );
-        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping-v1.4.2' );
+        $this->method_title       = __( 'Category Shipping', 'product-category-shipping-for-woocommerce' );
+        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping-for-woocommerce' );
         $this->supports           = [ 'shipping-zones', 'instance-settings' ];
         $this->enabled            = 'yes';
         $this->title              = $this->method_title;
@@ -148,7 +148,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
             }
 
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping-v1.4.2' );
+            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping-for-woocommerce' );
             $taxable    = ! empty( $rule['taxable'] ) && '1' === $rule['taxable'];
             $tax_status = $taxable ? 'taxable' : 'none';
             $suffix     = ( 'flat' === $amount['type'] ) ? '_flat' : '_tier';
@@ -158,7 +158,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
                 // same category no longer overwrite each other's rate.
                 'id'         => $this->bt_get_rate_id( $idx . '_' . $slug . $suffix ),
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping-v1.4.2' ),
+                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping-for-woocommerce' ),
                 'cost'       => $amount['price'],
                 'tax_status' => $tax_status,
                 'meta_data'  => [ 'bt_category' => $slug ],
@@ -234,12 +234,12 @@ class BT_Shipping_Method extends WC_Shipping_Method {
             $combined_label = ! empty( $settings['combined_label'] )
                 ? $settings['combined_label']
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                : __( 'Shipping', 'product-category-shipping-v1.4.2' );
+                : __( 'Shipping', 'product-category-shipping-for-woocommerce' );
 
             $this->add_rate( [
                 'id'         => $this->bt_get_rate_id( 'combined' ),
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping-v1.4.2' ),
+                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping-for-woocommerce' ),
                 'cost'       => $total,
                 'tax_status' => $tax_status,
                 'meta_data'  => [ 'bt_mode' => 'combined' ],
@@ -255,7 +255,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
         $pickup_label = ! empty( $settings['pickup_label'] )
             ? $settings['pickup_label']
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            : __( 'Local Pickup', 'product-category-shipping-v1.4.2' );
+            : __( 'Local Pickup', 'product-category-shipping-for-woocommerce' );
 
         if ( ! empty( $settings['pickup_note'] ) ) {
             $pickup_label .= ' — ' . $settings['pickup_note'];
