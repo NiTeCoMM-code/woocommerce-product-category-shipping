@@ -20,13 +20,13 @@
 	},
 	"scripts": {
 		"cs": [
-			"phpcs -n --standard=WordPress --extensions=php includes/ product-category-shipping.php"
+			"phpcs -n --standard=trunk/phpcs.xml --extensions=php includes/ product-category-shipping.php"
 		],
 		"cs-fix": [
 			"phpcbf --standard=WordPress --extensions=php includes/ product-category-shipping.php"
 		],
 		"compatibility": [
-			"phpcs -n --standard=PHPCompatibilityWP --extensions=php includes/ product-category-shipping.php"
+			"phpcs -n --standard=trunk/phpcs.xml --extensions=php includes/ product-category-shipping.php"
 		]
 	},
 	"autoload": {
