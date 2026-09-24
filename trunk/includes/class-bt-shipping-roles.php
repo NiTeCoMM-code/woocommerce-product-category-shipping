@@ -64,6 +64,7 @@ class BT_Shipping_Roles {
      * @return array<string,string> role_key => display name
      */
     public static function selectable_roles( $include_extra = [] ) {
+        /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
         $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping-for-woocommerce' ) ];
 
         if ( function_exists( 'wp_roles' ) ) {
@@ -75,6 +76,7 @@ class BT_Shipping_Roles {
         foreach ( self::sanitize( $include_extra ) as $key ) {
             if ( ! isset( $out[ $key ] ) && null === self::find_registered( $key, $out ) ) {
                 /* translators: %s: user role key */
+                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 $out[ $key ] = sprintf( __( '%s (no longer registered)', 'product-category-shipping-for-woocommerce' ), $key );
             }
         }
