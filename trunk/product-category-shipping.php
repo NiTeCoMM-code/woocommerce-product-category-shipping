@@ -48,9 +48,11 @@ add_filter( 'woocommerce_shipping_methods', function ( $methods ) {
 /* ---------------------------------------------------------------
  * 3. BOOT ADMIN UI
  * ------------------------------------------------------------- */
-add_action( 'admin_menu', function () {
-    new BT_Shipping_Admin();
-}, 20 );  // priority 20 after WooCommerce's menu at ~55
+add_action( 'plugins_loaded', function () {
+    if ( is_admin() ) {
+        BT_Shipping_Admin::get_instance();
+    }
+} );
 
 /* ---------------------------------------------------------------
  * 4. PACKAGING

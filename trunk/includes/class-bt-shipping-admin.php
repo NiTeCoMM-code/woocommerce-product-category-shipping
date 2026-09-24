@@ -14,7 +14,16 @@ defined( 'ABSPATH' ) || exit;
  */
 class BT_Shipping_Admin {
 
-    public function __construct() {
+    private static $instance = null;
+
+    public static function get_instance() {
+        if ( null === self::$instance ) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function __construct() {
         add_action( 'admin_menu',            [ $this, 'add_menu' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'admin_post_bt_shipping_save', [ $this, 'save_rules' ] );
