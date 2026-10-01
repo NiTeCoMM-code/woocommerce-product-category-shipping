@@ -6,7 +6,7 @@
  * Version:           1.4.2
  * Author:            Braxton Moody
  * License:           GPL-2.0+
- * Text Domain:       product-category-shipping
+ * Text Domain:       product-category-shipping-for-woocommerce
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Requires Plugins: woocommerce
@@ -18,10 +18,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BT_SHIPPING_VERSION', '1.4.1' );
-define( 'BT_SHIPPING_FILE',    __FILE__ );
-define( 'BT_SHIPPING_DIR',     plugin_dir_path( __FILE__ ) );
-define( 'BT_SHIPPING_URL',     plugin_dir_url( __FILE__ ) );
+define( 'PCSFW_VERSION', '1.4.2' );
+define( 'PCSFW_FILE',    __FILE__ );
+define( 'PCSFW_DIR',     plugin_dir_path( __FILE__ ) );
+define( 'PCSFW_URL',     plugin_dir_url( __FILE__ ) );
 
 /* ---------------------------------------------------------------
  * 1. LOAD SHARED + ADMIN CLASSES
@@ -30,18 +30,18 @@ define( 'BT_SHIPPING_URL',     plugin_dir_url( __FILE__ ) );
  *    packaging mode applies) and in wp-admin (the role picker),
  *    so it loads unconditionally.
  * ------------------------------------------------------------- */
-require_once BT_SHIPPING_DIR . 'includes/class-bt-shipping-roles.php';
-require_once BT_SHIPPING_DIR . 'includes/class-bt-shipping-admin.php';
+require_once PCSFW_DIR . 'includes/class-pcsfw-roles.php';
+require_once PCSFW_DIR . 'includes/class-pcsfw-admin.php';
 
 /* ---------------------------------------------------------------
  * 2. REGISTER SHIPPING METHOD WITH WOOCOMMERCE
  * ------------------------------------------------------------- */
 add_action( 'woocommerce_shipping_init', function () {
-    require_once BT_SHIPPING_DIR . 'includes/class-bt-shipping-method.php';
+    require_once PCSFW_DIR . 'includes/class-pcsfw-method.php';
 } );
 
 add_filter( 'woocommerce_shipping_methods', function ( $methods ) {
-    $methods['bt_category_shipping'] = 'BT_Shipping_Method';
+    $methods['pcsfw_category_shipping'] = 'PCSFW_Shipping_Method';
     return $methods;
 } );
 
@@ -50,7 +50,7 @@ add_filter( 'woocommerce_shipping_methods', function ( $methods ) {
  * ------------------------------------------------------------- */
 add_action( 'plugins_loaded', function () {
     if ( is_admin() ) {
-        BT_Shipping_Admin::get_instance();
+        PCSFW_Admin::get_instance();
     }
 } );
 
@@ -86,31 +86,31 @@ add_action( 'plugins_loaded', function () {
  *    The total charged is identical to split mode; only the
  *    itemised per-category breakdown is not shown.
  *
- *    Both modes stamp 'bt_roles' onto the package. WooCommerce
+ *    Both modes stamp 'pcsfw_roles' onto the package. WooCommerce
  *    hashes the whole package array to key its shipping-rate cache,
  *    so including roles means a login, logout, or role change
  *    invalidates cached rates instead of serving a stale price.
  * ------------------------------------------------------------- */
 add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
 
-    $rules      = get_option( 'bt_shipping_rules', [] );
-    $role_rules = get_option( 'bt_shipping_role_rules', [] );
+    $rules      = get_option( 'pcsfw_shipping_rules', [] );
+    $role_rules = get_option( 'pcsfw_shipping_role_rules', [] );
 
     if ( empty( $rules ) && empty( $role_rules ) ) {
         return $packages;
     }
 
-    $bt_roles = BT_Shipping_Roles::current_roles();
+    $bt_roles = PCSFW_Shipping_Roles::current_roles();
 
     /* ---------- COMBINED MODE ----------
      * Eligibility is checked BEFORE any slug work. Combined mode never splits,
      * and the override set may target categories the default set does not
      * cover — so the default slug list is irrelevant here.
      */
-    if ( BT_Shipping_Roles::is_eligible( $bt_roles ) ) {
+    if ( PCSFW_Shipping_Roles::is_eligible( $bt_roles ) ) {
         foreach ( $packages as $k => $pkg ) {
-            $packages[ $k ]['bt_mode']  = 'combined';
-            $packages[ $k ]['bt_roles'] = $bt_roles;
+            $packages[ $k ]['pcsfw_mode']  = 'combined';
+            $packages[ $k ]['pcsfw_roles'] = $bt_roles;
         }
         return $packages;
     }
@@ -167,15 +167,15 @@ add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
 
     /*
      * Single-bucket carts need no split, but they still get the
-     * bt_category / bt_roles stamps so the method follows the same code
+     * pcsfw_category / pcsfw_roles stamps so the method follows the same code
      * path and the rate cache stays role-aware.
      */
     if ( 1 === count( $buckets ) && 1 === count( $packages ) ) {
         $only_slug = key( $buckets );
         foreach ( $packages as $k => $pkg ) {
-            $packages[ $k ]['bt_mode']     = 'split';
-            $packages[ $k ]['bt_category'] = $only_slug;
-            $packages[ $k ]['bt_roles']    = $bt_roles;
+            $packages[ $k ]['pcsfw_mode']     = 'split';
+            $packages[ $k ]['pcsfw_category'] = $only_slug;
+            $packages[ $k ]['pcsfw_roles']    = $bt_roles;
         }
         return $packages;
     }
@@ -198,9 +198,9 @@ add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
             'user'            => $template['user']            ?? [ 'ID' => get_current_user_id() ],
             'destination'     => $template['destination']     ?? [],
             'cart_subtotal'   => $template['cart_subtotal']   ?? 0,
-            'bt_mode'         => 'split',
-            'bt_category'     => $slug,
-            'bt_roles'        => $bt_roles,
+            'pcsfw_mode'         => 'split',
+            'pcsfw_category'     => $slug,
+            'pcsfw_roles'        => $bt_roles,
         ];
     }
 
@@ -237,8 +237,8 @@ add_action( 'woocommerce_checkout_create_order', function ( $order ) {
  *    a stale transient version can show the wrong options right after
  *    a role change or login.
  * ------------------------------------------------------------- */
-foreach ( [ 'set_user_role', 'add_user_role', 'remove_user_role', 'wp_login', 'wp_logout' ] as $bt_shipping_clear_hook ) {
-    add_action( $bt_shipping_clear_hook, function () {
+foreach ( [ 'set_user_role', 'add_user_role', 'remove_user_role', 'wp_login', 'wp_logout' ] as $pcsfw_clear_hook ) {
+    add_action( $pcsfw_clear_hook, function () {
         if ( class_exists( 'WC_Cache_Helper' ) ) {
             WC_Cache_Helper::get_transient_version( 'shipping', true );
         }
@@ -250,7 +250,7 @@ foreach ( [ 'set_user_role', 'add_user_role', 'remove_user_role', 'wp_login', 'w
  * ------------------------------------------------------------- */
 register_activation_hook( __FILE__, function () {
 
-    if ( false === get_option( 'bt_shipping_rules' ) ) {
+    if ( false === get_option( 'pcsfw_shipping_rules' ) ) {
         $defaults = [
             [
                 'category_slug' => 'cajun-seasoning',
@@ -272,18 +272,18 @@ register_activation_hook( __FILE__, function () {
                 'flat_price'    => '5.99',
             ],
         ];
-        update_option( 'bt_shipping_rules', $defaults );
+        update_option( 'pcsfw_shipping_rules', $defaults );
     }
 
     // Override rules for the selected roles. Empty = selected roles simply
     // use the default rates above.
-    if ( false === get_option( 'bt_shipping_role_rules' ) ) {
-        update_option( 'bt_shipping_role_rules', [] );
+    if ( false === get_option( 'pcsfw_shipping_role_rules' ) ) {
+        update_option( 'pcsfw_shipping_role_rules', [] );
     }
 
     // Empty pickup_roles = feature off = identical to v1.0.4.
-    if ( false === get_option( 'bt_shipping_settings' ) ) {
-        update_option( 'bt_shipping_settings', [
+    if ( false === get_option( 'pcsfw_shipping_settings' ) ) {
+        update_option( 'pcsfw_shipping_settings', [
             'pickup_roles'      => [],
             'pickup_label'      => 'Local Pickup',
             'pickup_note'       => '',

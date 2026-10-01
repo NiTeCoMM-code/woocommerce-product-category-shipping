@@ -4,14 +4,14 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server (e.g. product-category-shipping/).
- * The canonical Text Domain header is product-category-shipping,
+ * The canonical Text Domain header is product-category-shipping-for-woocommerce-for-woocommerce,
  * matching the wordpress.org slug. Folder names vary by install/auto-update version.
  * The declared domain is correct; the mismatch is a false positive.
  */
 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 
 /**
- * BT_Shipping_Admin
+ * PCSFW_Admin
  *
  * Adds a "Category Shipping" menu page under WooCommerce in wp-admin.
  * Lets the merchant:
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
  *   - Add unlimited tiers per tiered rule
  *   - Pick which user roles get the cart-wide Local Pickup option
  */
-class BT_Shipping_Admin {
+class PCSFW_Admin {
 
     private static $instance = null;
 
@@ -35,8 +35,8 @@ class BT_Shipping_Admin {
     private function __construct() {
         add_action( 'admin_menu',            [ $this, 'add_menu' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-        add_action( 'admin_post_bt_shipping_save', [ $this, 'save_rules' ] );
-        add_action( 'wp_ajax_bt_get_categories', [ $this, 'ajax_get_categories' ] );
+        add_action( 'admin_post_pcsfw_shipping_save', [ $this, 'save_rules' ] );
+        add_action( 'wp_ajax_pcsfw_get_categories', [ $this, 'ajax_get_categories' ] );
     }
 
     /* ------------------------------------------------------------------
@@ -46,10 +46,10 @@ class BT_Shipping_Admin {
         add_submenu_page(
             'woocommerce',
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            __( 'Category Shipping Rules', 'product-category-shipping' ),
-            __( 'Category Shipping', 'product-category-shipping' ),
+            __( 'Category Shipping Rules', 'product-category-shipping-for-woocommerce' ),
+            __( 'Category Shipping', 'product-category-shipping-for-woocommerce' ),
             'manage_woocommerce',
-            'bt-shipping-rules',
+            'pcsfw-shipping-rules',
             [ $this, 'render_page' ]
         );
     }
@@ -58,20 +58,20 @@ class BT_Shipping_Admin {
      * ASSETS
      * ------------------------------------------------------------------ */
     public function enqueue_assets( $hook ) {
-        if ( $hook !== 'woocommerce_page_bt-shipping-rules' ) {
+        if ( $hook !== 'woocommerce_page_pcsfw-shipping-rules' ) {
             return;
         }
         wp_enqueue_style(
-            'bt-shipping-admin',
-            BT_SHIPPING_URL . 'admin.css',
+            'pcsfw-shipping-admin',
+            PCSFW_URL . 'admin.css',
             [],
-            BT_SHIPPING_VERSION
+            PCSFW_VERSION
         );
         wp_enqueue_script(
-            'bt-shipping-admin',
-            BT_SHIPPING_URL . 'admin.js',
+            'pcsfw-shipping-admin',
+            PCSFW_URL . 'admin.js',
             [],
-            BT_SHIPPING_VERSION,
+            PCSFW_VERSION,
             true
         );
     }
@@ -80,15 +80,15 @@ class BT_Shipping_Admin {
      * RENDER PAGE
      * ------------------------------------------------------------------ */
     public function render_page() {
-        $saved      = get_option( 'bt_shipping_rules', [] );
-        $role_saved = get_option( 'bt_shipping_role_rules', [] );
-        $settings   = (array) get_option( 'bt_shipping_settings', [] );
+        $saved      = get_option( 'pcsfw_shipping_rules', [] );
+        $role_saved = get_option( 'pcsfw_shipping_role_rules', [] );
+        $settings   = (array) get_option( 'pcsfw_shipping_settings', [] );
         $message    = '';
 
-        if ( isset( $_GET['bt_saved'], $_GET['_wpnonce'] )
-            && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'bt_saved' )
+        if ( isset( $_GET['pcsfw_saved'], $_GET['_wpnonce'] )
+            && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'pcsfw_saved' )
         ) {
-            $saved_msg = sanitize_text_field( wp_unslash( $_GET['bt_saved'] ) );
+            $saved_msg = sanitize_text_field( wp_unslash( $_GET['pcsfw_saved'] ) );
             $message   = $saved_msg === '1'
                 ? '<div class="bt-notice success">✓ Shipping rules saved successfully.</div>'
                 : '<div class="bt-notice">Something went wrong. Please try again.</div>';
@@ -103,10 +103,10 @@ class BT_Shipping_Admin {
 
         ob_start();
         ?>
-        <div id="bt-shipping-wrap">
+        <div id="pcsfw-shipping-wrap">
             <h1>
                 Category Shipping Rules
-                <span class="bt-badge">v<?php echo esc_html( BT_SHIPPING_VERSION ); ?></span>
+                <span class="bt-badge">v<?php echo esc_html( PCSFW_VERSION ); ?></span>
             </h1>
             <p class="bt-desc">
                 Configure per-category shipping rates. Assign <strong>Flat Rate</strong> or <strong>Tiered Quantity</strong> rules to any product category.
@@ -115,9 +115,9 @@ class BT_Shipping_Admin {
 
             <?php echo wp_kses_post( $message ); ?>
 
-            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="bt-shipping-form">
-                <?php wp_nonce_field( 'bt_shipping_save', 'bt_nonce' ); ?>
-                <input type="hidden" name="action" value="bt_shipping_save">
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="pcsfw-shipping-form">
+                <?php wp_nonce_field( 'pcsfw_shipping_save', 'pcsfw_nonce' ); ?>
+                <input type="hidden" name="action" value="pcsfw_shipping_save">
 
                 <?php $this->render_pickup_card( $settings, array_merge( (array) $saved, (array) $role_saved ) ); ?>
 
@@ -126,7 +126,7 @@ class BT_Shipping_Admin {
                     <span class="bt-section-sub">Apply to every customer</span>
                 </h2>
 
-                <div id="bt-rules-container">
+                <div id="pcsfw-rules-container">
                     <?php
                     if ( empty( $saved ) ) {
                         echo '<p style="color:#888;font-size:.9rem;">No rules yet. Click "Add Shipping Rule" to get started.</p>';
@@ -138,14 +138,14 @@ class BT_Shipping_Admin {
                     ?>
                 </div>
 
-                <button type="button" id="bt-add-rule"
-                        data-container="bt-rules-container"
-                        data-template="bt-rule-template"
+                <button type="button" id="pcsfw-add-rule"
+                        data-container="pcsfw-rules-container"
+                        data-template="pcsfw-rule-template"
                         data-count="<?php echo esc_attr( count( (array) $saved ) ); ?>">+ Add Shipping Rule</button>
 
                 <?php $this->render_role_rules_intro( $settings ); ?>
 
-                <div id="bt-role-rules-container">
+                <div id="pcsfw-role-rules-container">
                     <?php
                     if ( empty( $role_saved ) ) {
                         echo '<p style="color:#888;font-size:.9rem;">No override rules. Selected roles are charged the default rates above.</p>';
@@ -157,9 +157,9 @@ class BT_Shipping_Admin {
                     ?>
                 </div>
 
-                <button type="button" id="bt-add-role-rule" class="bt-add-role"
-                        data-container="bt-role-rules-container"
-                        data-template="bt-role-rule-template"
+                <button type="button" id="pcsfw-add-role-rule" class="bt-add-role"
+                        data-container="pcsfw-role-rules-container"
+                        data-template="pcsfw-role-rule-template"
                         data-count="<?php echo esc_attr( count( (array) $role_saved ) ); ?>">+ Add Override Rule</button>
 
                 <div class="bt-save-bar">
@@ -169,10 +169,10 @@ class BT_Shipping_Admin {
             </form>
 
             <!-- Hidden templates for new rules (rendered server-side, cloned by JS) -->
-            <template id="bt-rule-template">
+            <template id="pcsfw-rule-template">
                 <?php $this->render_rule_card( '__IDX__', [], $categories, 'rules' ); ?>
             </template>
-            <template id="bt-role-rule-template">
+            <template id="pcsfw-role-rule-template">
                 <?php $this->render_rule_card( '__IDX__', [], $categories, 'role_rules' ); ?>
             </template>
         </div>
@@ -185,8 +185,8 @@ class BT_Shipping_Admin {
      * RENDER THE OVERRIDE-SECTION HEADING
      * ------------------------------------------------------------------ */
     private function render_role_rules_intro( $settings ) {
-        $pickup_roles = BT_Shipping_Roles::sanitize( $settings['pickup_roles'] ?? [] );
-        $names        = BT_Shipping_Roles::labels( $pickup_roles );
+        $pickup_roles = PCSFW_Shipping_Roles::sanitize( $settings['pickup_roles'] ?? [] );
+        $names        = PCSFW_Shipping_Roles::labels( $pickup_roles );
         ?>
         <h2 class="bt-section-head role">
             Selected-Role Override Rules
@@ -195,7 +195,7 @@ class BT_Shipping_Admin {
                 echo $names
                     ? esc_html( implode( ', ', $names ) )
                     /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping' );
+                    : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping-for-woocommerce' );
                 ?>
             </span>
         </h2>
@@ -218,8 +218,8 @@ class BT_Shipping_Admin {
      * ------------------------------------------------------------------ */
     private function render_pickup_card( $settings, $rules ) {
 
-        $pickup_roles   = BT_Shipping_Roles::sanitize( $settings['pickup_roles'] ?? [] );
-        $roles          = BT_Shipping_Roles::selectable_roles( $pickup_roles );
+        $pickup_roles   = PCSFW_Shipping_Roles::sanitize( $settings['pickup_roles'] ?? [] );
+        $roles          = PCSFW_Shipping_Roles::selectable_roles( $pickup_roles );
         $pickup_label   = $settings['pickup_label']   ?? 'Local Pickup';
         $pickup_note    = $settings['pickup_note']    ?? '';
         $combined_label = $settings['combined_label'] ?? 'Shipping';
@@ -248,8 +248,8 @@ class BT_Shipping_Admin {
         }
         $mixed_tax = count( array_unique( $tax_states ) ) > 1;
         ?>
-        <div class="bt-rule-card" id="bt-pickup-card">
-            <div class="bt-rule-header" onclick="btToggleCard(this)">
+        <div class="pcsfw-rule-card" id="pcsfw-pickup-card">
+            <div class="pcsfw-rule-header" onclick="pcsfwToggleCard(this)">
                 <h3>
                     🏪 Local Pickup &amp; User Roles
                     <span class="bt-status-pill <?php echo $is_on ? 'on' : 'off'; ?>">
@@ -258,11 +258,11 @@ class BT_Shipping_Admin {
                 </h3>
                 <span>▾</span>
             </div>
-            <div class="bt-rule-body">
+            <div class="pcsfw-rule-body">
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping' ); ?></label>
-                <select class="bt-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
+                <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping-for-woocommerce' ); ?></label>
+                <select class="pcsfw-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
                     <?php foreach ( $roles as $key => $display ) : ?>
                         <option value="<?php echo esc_attr( $key ); ?>"
                             <?php echo in_array( strtolower( (string) $key ), $selected_lc, true ) ? 'selected' : ''; ?>>
@@ -308,14 +308,14 @@ class BT_Shipping_Admin {
                 <div class="bt-row" style="margin-top:20px;">
                     <div>
                         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping-for-woocommerce' ); ?></label>
                         <input type="text" name="bt_settings[pickup_label]"
                                value="<?php echo esc_attr( $pickup_label ); ?>"
                                placeholder="Local Pickup">
                     </div>
                     <div>
                         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping' ); ?></label>
+                        <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping-for-woocommerce' ); ?></label>
                         <input type="text" name="bt_settings[combined_label]"
                                value="<?php echo esc_attr( $combined_label ); ?>"
                                placeholder="Shipping">
@@ -324,7 +324,7 @@ class BT_Shipping_Admin {
                 </div>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <input type="text" name="bt_settings[pickup_note]"
                        value="<?php echo esc_attr( $pickup_note ); ?>"
                        placeholder="e.g. 1234 Main St — Mon–Fri 9am–5pm">
@@ -332,7 +332,7 @@ class BT_Shipping_Admin {
 
                 <div class="bt-toggle-row" style="margin-top:22px;">
                     <input type="checkbox" class="bt-toggle"
-                           name="bt_settings[force_pickup_rate]" id="bt_force_pickup_rate"
+                           name="bt_settings[force_pickup_rate]" id="pcsfw_force_pickup_rate"
                            value="1" <?php checked( $force_rate, '1' ); ?>>
                     <label for="bt_force_pickup_rate">
                         Always show both options, even if another plugin tries to remove one
@@ -368,16 +368,16 @@ class BT_Shipping_Admin {
 
                 <div class="bt-tiers-wrap" style="margin-top:26px;">
                     /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping' ); ?></h4>
+                    <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping-for-woocommerce' ); ?></h4>
                     <table class="bt-tier-table">
                         <thead>
                             <tr>
                                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                                <th><?php esc_html_e( 'Role', 'product-category-shipping' ); ?></th>
-                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping' ); ?></th>
-                                <th><?php esc_html_e( 'Users', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Role', 'product-category-shipping-for-woocommerce' ); ?></th>
+                                <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping-for-woocommerce' ); ?></th>
+                                <th><?php esc_html_e( 'Users', 'product-category-shipping-for-woocommerce' ); ?></th>
                                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping' ); ?></th>
+                                <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping-for-woocommerce' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -385,7 +385,7 @@ class BT_Shipping_Admin {
                         $counts = function_exists( 'count_users' ) ? count_users() : [ 'avail_roles' => [] ];
                         foreach ( $roles as $key => $display ) :
                             $eligible = in_array( strtolower( (string) $key ), $selected_lc, true );
-                            $n        = ( BT_Shipping_Roles::GUEST === $key )
+                            $n        = ( PCSFW_Shipping_Roles::GUEST === $key )
                                 ? '—'
                                 : (string) ( $counts['avail_roles'][ $key ] ?? 0 );
                             ?>
@@ -413,7 +413,7 @@ class BT_Shipping_Admin {
                 </div>
 
             </div>
-            <div class="bt-rule-footer" style="justify-content:flex-start;">
+            <div class="pcsfw-rule-footer" style="justify-content:flex-start;">
                 <span style="font-size:.78rem;color:#888;">Saved together with the shipping rules below.</span>
             </div>
         </div>
@@ -451,18 +451,18 @@ class BT_Shipping_Admin {
         $uid   = ( 'role_rules' === $ns ? 'r' : 'd' ) . '_' . $i;
         $base  = $ns . '[' . $i . ']';
         ?>
-        <div class="bt-rule-card" data-index="<?php echo esc_attr( $i ); ?>">
-            <div class="bt-rule-header" onclick="btToggleCard(this)">
+        <div class="pcsfw-rule-card" data-index="<?php echo esc_attr( $i ); ?>">
+            <div class="pcsfw-rule-header" onclick="pcsfwToggleCard(this)">
                 <h3>
                     <?php echo esc_html( $header_label ); ?>
                     <span class="bt-rule-type-badge"><?php echo esc_html( $type_badge ); ?></span>
                 </h3>
                 <span>▾</span>
             </div>
-            <div class="bt-rule-body">
+            <div class="pcsfw-rule-body">
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Product Category', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Product Category', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <select name="<?php echo esc_attr( $base ); ?>[category_slug]"
                         onchange="btUpdateHeader(this)">
                     <option value="">— Select a category —</option>
@@ -475,7 +475,7 @@ class BT_Shipping_Admin {
                 </select>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping' ); ?></label>
+                <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <input type="text" name="<?php echo esc_attr( $base ); ?>[label]"
                        value="<?php echo esc_attr( $label ); ?>"
                        placeholder="e.g. Shipping">
@@ -489,7 +489,7 @@ class BT_Shipping_Admin {
                 </p>
 
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping' ); ?></label>
+                <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping-for-woocommerce' ); ?></label>
                 <div class="bt-type-selector">
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
@@ -512,7 +512,7 @@ class BT_Shipping_Admin {
                     <div class="bt-row">
                         <div>
                             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping-for-woocommerce' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_price]"
                                    value="<?php echo esc_attr( $flat_price ); ?>"
@@ -521,7 +521,7 @@ class BT_Shipping_Admin {
                         </div>
                         <div>
                             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping' ); ?></label>
+                            <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping-for-woocommerce' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_additional]"
                                    value="<?php echo esc_attr( $flat_additional ); ?>"
@@ -577,7 +577,7 @@ class BT_Shipping_Admin {
                 </div>
 
             </div><!-- .bt-rule-body -->
-            <div class="bt-rule-footer">
+            <div class="pcsfw-rule-footer">
                 <button type="button" class="bt-remove-rule"
                         onclick="btRemoveRule(this)">Remove Rule</button>
             </div>
@@ -674,9 +674,9 @@ class BT_Shipping_Admin {
      * ------------------------------------------------------------------ */
     public function save_rules() {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $bt_nonce = isset( $_POST['bt_nonce'] ) ? wp_unslash( $_POST['bt_nonce'] ) : '';
+        $pcsfw_nonce = isset( $_POST['pcsfw_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['pcsfw_nonce'] ) ) : '';
         if (
-            ! wp_verify_nonce( $bt_nonce, 'bt_shipping_save' ) ||
+            ! wp_verify_nonce( $pcsfw_nonce, 'pcsfw_shipping_save' ) ||
             ! current_user_can( 'manage_woocommerce' )
         ) {
             wp_die( 'Unauthorized', 403 );
@@ -684,8 +684,8 @@ class BT_Shipping_Admin {
 
         /* ---- GLOBAL LOCAL PICKUP SETTINGS ---- */
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $bt_post_settings = isset( $_POST['bt_settings'] ) ? $_POST['bt_settings'] : [];
-        $raw_settings     = wp_unslash( (array) $bt_post_settings );
+        $pcsfw_post_settings = isset( $_POST['pcsfw_settings'] ) ? $_POST['pcsfw_settings'] : [];
+        $raw_settings     = wp_unslash( (array) $pcsfw_post_settings );
 
         /*
          * Resolve each submitted key against the roles actually registered
@@ -693,16 +693,16 @@ class BT_Shipping_Admin {
          * and quietly heals installs whose stored keys were lowercased by
          * sanitize_key() in versions up to 1.2.0.
          */
-        $posted_roles = BT_Shipping_Roles::sanitize( $raw_settings['pickup_roles'] ?? [] );
+        $posted_roles = PCSFW_Shipping_Roles::sanitize( $raw_settings['pickup_roles'] ?? [] );
         $pickup_roles = [];
         foreach ( $posted_roles as $role_key ) {
-            $resolved = BT_Shipping_Roles::resolve( $role_key );
+            $resolved = PCSFW_Shipping_Roles::resolve( $role_key );
             if ( ! in_array( $resolved, $pickup_roles, true ) ) {
                 $pickup_roles[] = $resolved;
             }
         }
 
-        update_option( 'bt_shipping_settings', [
+        update_option( 'pcsfw_shipping_settings', [
             // Empty = feature off. Never treated as "all roles".
             'pickup_roles'      => $pickup_roles,
             'pickup_label'      => sanitize_text_field( $raw_settings['pickup_label']   ?? 'Local Pickup' ) ?: 'Local Pickup',
@@ -713,19 +713,19 @@ class BT_Shipping_Admin {
 
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $bt_rules_input = isset( $_POST['rules'] ) ? (array) $_POST['rules'] : [];
-        update_option( 'bt_shipping_rules', $this->sanitize_rule_set( $bt_rules_input ) );
+        $pcsfw_rules_input = isset( $_POST['rules'] ) ? (array) $_POST['rules'] : [];
+        update_option( 'pcsfw_shipping_rules', $this->sanitize_rule_set( $pcsfw_rules_input ) );
 
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $bt_role_rules_input = isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : [];
-        update_option( 'bt_shipping_role_rules', $this->sanitize_rule_set( $bt_role_rules_input ) );
+        $pcsfw_role_rules_input = isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : [];
+        update_option( 'pcsfw_shipping_role_rules', $this->sanitize_rule_set( $pcsfw_role_rules_input ) );
 
         // Clear WooCommerce shipping cache
         WC_Cache_Helper::get_transient_version( 'shipping', true );
 
         wp_safe_redirect( add_query_arg( [
-            'page'     => 'bt-shipping-rules',
-            'bt_saved' => '1',
+            'page'     => 'pcsfw-shipping-rules',
+            'pcsfw_saved' => '1',
         ], admin_url( 'admin.php' ) ) );
         exit;
     }

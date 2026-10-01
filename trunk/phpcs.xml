@@ -31,6 +31,6 @@
         user-supplied text and carries no injection risk.
     -->
     <rule ref="WordPress.Security.EscapeOutput.OutputNotEscaped">
-        <exclude-pattern>includes/class-bt-shipping-admin.php</exclude-pattern>
+        <exclude-pattern>includes/class-pcsfw-admin.php</exclude-pattern>
     </rule>
 </ruleset>

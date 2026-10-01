@@ -4,12 +4,12 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping, matching the wordpress.org slug.
+ * is product-category-shipping-for-woocommerce-for-woocommerce, matching the wordpress.org slug.
  */
 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 
 /**
- * BT_Shipping_Roles
+ * PCSFW_Shipping_Roles
  *
  * Decides whether the current customer belongs to a role that gets the
  * cart-wide choice between:
@@ -20,11 +20,11 @@ defined( 'ABSPATH' ) || exit;
  * Everyone else gets stock v1.0.4 behaviour: the cart is split into one
  * package per category and each category is charged its own rate.
  *
- * There is exactly ONE role list in this plugin (bt_shipping_settings →
+ * There is exactly ONE role list in this plugin (pcsfw_shipping_settings →
  * pickup_roles). Role targeting deliberately does not exist at the
  * individual rule level — a single list is far harder to misconfigure.
  */
-class BT_Shipping_Roles {
+class PCSFW_Shipping_Roles {
 
     /**
      * Synthetic role key for logged-out visitors. WordPress has no real
@@ -65,7 +65,7 @@ class BT_Shipping_Roles {
      */
     public static function selectable_roles( $include_extra = [] ) {
         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-        $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping' ) ];
+        $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping-for-woocommerce' ) ];
 
         if ( function_exists( 'wp_roles' ) ) {
             foreach ( wp_roles()->get_names() as $key => $name ) {
@@ -78,7 +78,7 @@ class BT_Shipping_Roles {
                 /* translators: %s: user role key */
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 $out[ $key ] = /* translators: %s: role key */
-                sprintf( __( '%s (no longer registered)', 'product-category-shipping' ), $key );
+                sprintf( __( '%s (no longer registered)', 'product-category-shipping-for-woocommerce' ), $key );
             }
         }
 
@@ -129,7 +129,7 @@ class BT_Shipping_Roles {
      * @return string[]
      */
     public static function pickup_roles() {
-        $settings = (array) get_option( 'bt_shipping_settings', [] );
+        $settings = (array) get_option( 'pcsfw_shipping_settings', [] );
         return self::sanitize( isset( $settings['pickup_roles'] ) ? $settings['pickup_roles'] : [] );
     }
 

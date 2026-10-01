@@ -4,15 +4,15 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping, matching the wordpress.org slug.
+ * is product-category-shipping-for-woocommerce-for-woocommerce, matching the wordpress.org slug.
  */
 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 
 /**
- * BT_Shipping_Method
+ * PCSFW_Shipping_Method
  *
  * Extends WC_Shipping_Method to inject per-category shipping rates
- * at checkout. Reads rules from the bt_shipping_rules option set via
+ * at checkout. Reads rules from the pcsfw_shipping_rules option set via
  * the admin settings page.
  *
  * Two modes, selected by the packaging filter in the main plugin file
@@ -22,14 +22,14 @@ defined( 'ABSPATH' ) || exit;
  *   combined — pickup-eligible roles. One package, two rates:
  *              a single summed "Shipping" charge, or free Local Pickup.
  */
-class BT_Shipping_Method extends WC_Shipping_Method {
+class PCSFW_Shipping_Method extends WC_Shipping_Method {
 
     public function __construct( $instance_id = 0 ) {
-        $this->id                 = 'bt_category_shipping';
+        $this->id                 = 'pcsfw_category_shipping';
         $this->instance_id        = absint( $instance_id );
         /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-        $this->method_title       = __( 'Category Shipping', 'product-category-shipping' );
-        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping' );
+        $this->method_title       = __( 'Category Shipping', 'product-category-shipping-for-woocommerce' );
+        $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping-for-woocommerce' );
         $this->supports           = [ 'shipping-zones', 'instance-settings' ];
         $this->enabled            = 'yes';
         $this->title              = $this->method_title;
@@ -70,11 +70,11 @@ class BT_Shipping_Method extends WC_Shipping_Method {
      * ------------------------------------------------------------------ */
     public function ensure_combined_rates( $rates, $package ) {
 
-        if ( ! isset( $package['bt_mode'] ) || 'combined' !== $package['bt_mode'] ) {
+        if ( ! isset( $package['pcsfw_mode'] ) || 'combined' !== $package['pcsfw_mode'] ) {
             return $rates;
         }
 
-        $settings = (array) get_option( 'bt_shipping_settings', [] );
+        $settings = (array) get_option( 'pcsfw_shipping_settings', [] );
         $force    = isset( $settings['force_pickup_rate'] ) ? $settings['force_pickup_rate'] : '1';
 
         if ( '1' !== $force || empty( $this->rates ) ) {
@@ -96,12 +96,12 @@ class BT_Shipping_Method extends WC_Shipping_Method {
      * Called by WooCommerce for each package in the cart.
      * ------------------------------------------------------------------ */
     public function calculate_shipping( $package = [] ) {
-        $rules = get_option( 'bt_shipping_rules', [] );
+        $rules = get_option( 'pcsfw_shipping_rules', [] );
         if ( empty( $rules ) ) {
             return;
         }
 
-        $mode = isset( $package['bt_mode'] ) ? $package['bt_mode'] : 'split';
+        $mode = isset( $package['pcsfw_mode'] ) ? $package['pcsfw_mode'] : 'split';
 
         if ( 'combined' === $mode ) {
             $this->calculate_combined( $package, $rules );
@@ -117,7 +117,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
      * ------------------------------------------------------------------ */
     protected function calculate_split( $package, $rules ) {
 
-        $pkg_category = isset( $package['bt_category'] ) ? $package['bt_category'] : null;
+        $pkg_category = isset( $package['pcsfw_category'] ) ? $package['pcsfw_category'] : null;
 
         // Items outside every managed category get no BT rates.
         if ( '_other' === $pkg_category ) {
@@ -148,7 +148,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
             }
 
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping' );
+            $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping-for-woocommerce' );
             $taxable    = ! empty( $rule['taxable'] ) && '1' === $rule['taxable'];
             $tax_status = $taxable ? 'taxable' : 'none';
             $suffix     = ( 'flat' === $amount['type'] ) ? '_flat' : '_tier';
@@ -156,12 +156,12 @@ class BT_Shipping_Method extends WC_Shipping_Method {
             $this->add_rate( [
                 // Rule index is part of the ID as of 1.2.0 so two rules on the
                 // same category no longer overwrite each other's rate.
-                'id'         => $this->bt_get_rate_id( $idx . '_' . $slug . $suffix ),
+                'id'         => $this->pcsfw_get_rate_id( $idx . '_' . $slug . $suffix ),
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping' ),
+                'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping-for-woocommerce' ),
                 'cost'       => $amount['price'],
                 'tax_status' => $tax_status,
-                'meta_data'  => [ 'bt_category' => $slug ],
+                'meta_data'  => [ 'pcsfw_category' => $slug ],
             ] );
         }
     }
@@ -174,8 +174,8 @@ class BT_Shipping_Method extends WC_Shipping_Method {
      * ------------------------------------------------------------------ */
     protected function calculate_combined( $package, $rules ) {
 
-        $settings   = (array) get_option( 'bt_shipping_settings', [] );
-        $role_rules = (array) get_option( 'bt_shipping_role_rules', [] );
+        $settings   = (array) get_option( 'pcsfw_shipping_settings', [] );
+        $role_rules = (array) get_option( 'pcsfw_shipping_role_rules', [] );
 
         /*
          * Group both rule sets by category slug. For any category the customer
@@ -234,15 +234,15 @@ class BT_Shipping_Method extends WC_Shipping_Method {
             $combined_label = ! empty( $settings['combined_label'] )
                 ? $settings['combined_label']
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                : __( 'Shipping', 'product-category-shipping' );
+                : __( 'Shipping', 'product-category-shipping-for-woocommerce' );
 
             $this->add_rate( [
-                'id'         => $this->bt_get_rate_id( 'combined' ),
+                'id'         => $this->pcsfw_get_rate_id( 'combined' ),
                 /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping' ),
+                'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping-for-woocommerce' ),
                 'cost'       => $total,
                 'tax_status' => $tax_status,
-                'meta_data'  => [ 'bt_mode' => 'combined' ],
+                'meta_data'  => [ 'pcsfw_mode' => 'combined' ],
             ] );
         }
 
@@ -255,18 +255,18 @@ class BT_Shipping_Method extends WC_Shipping_Method {
         $pickup_label = ! empty( $settings['pickup_label'] )
             ? $settings['pickup_label']
             /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-            : __( 'Local Pickup', 'product-category-shipping' );
+            : __( 'Local Pickup', 'product-category-shipping-for-woocommerce' );
 
         if ( ! empty( $settings['pickup_note'] ) ) {
             $pickup_label .= ' — ' . $settings['pickup_note'];
         }
 
         $this->add_rate( [
-            'id'         => $this->bt_get_rate_id( 'bt_pickup' ),
+            'id'         => $this->pcsfw_get_rate_id( 'bt_pickup' ),
             'label'      => $pickup_label,
             'cost'       => 0.0,
             'tax_status' => 'none',
-            'meta_data'  => [ 'bt_mode' => 'pickup' ],
+            'meta_data'  => [ 'pcsfw_mode' => 'pickup' ],
         ] );
     }
 
@@ -426,7 +426,7 @@ class BT_Shipping_Method extends WC_Shipping_Method {
     /**
      * Stable rate ID scoped to this method instance + suffix.
      */
-    public function bt_get_rate_id( $suffix = '' ) {
+    public function pcsfw_get_rate_id( $suffix = '' ) {
         return $this->id . '_' . $this->instance_id . '_' . $suffix;
     }
 }
