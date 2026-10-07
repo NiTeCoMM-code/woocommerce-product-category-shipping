@@ -68,18 +68,11 @@ The **Local Pickup & User Roles** section includes a **diagnostics table** listi
 
 ## Installation
 
-```bash
-# Option 1: Upload via WordPress admin
-# Download the zip from the Releases page and upload via Plugins → Add New → Upload Plugin.
-
-# Option 2: Clone into wp-content/plugins
-git clone https://github.com/NiTeCoMM-code/woocommerce-product-category-shipping.git
-cd woocommerce-product-category-shipping/trunk
-# Move contents up one level so product-category-shipping.php is at:
-# wp-content/plugins/product-category-shipping/product-category-shipping.php
-```
-
-Then activate via **Plugins → Installed Plugins** and configure at **WooCommerce → Settings → Shipping → Product Category Shipping**.
+1. Upload the `product-category-shipping` folder to `/wp-content/plugins/` or install via the WordPress Plugins screen.
+2. Activate the plugin through the Plugins menu in WordPress.
+3. Go to **WooCommerce → Settings → Shipping → Shipping Zones** and add Shipping Method, "Category Shipping".
+4. Go to **WooCommerce → Category Shipping** to add rules for each product category you manage. You may also add a Free Local Pickup option for multiple select roles.
+5. Save Shipping Rules.
 
 ---
 
