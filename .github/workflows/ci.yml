@@ -26,7 +26,12 @@ jobs:
         run: composer install --no-interaction --no-progress --no-scripts
 
       - name: PHP syntax check
-        run: find trunk -name "*.php" -exec php -l {} \; 2>&1 | grep -v "No syntax errors"
+        run: |
+          status=0
+          while IFS= read -r file; do
+            php -l "$file" || status=1
+          done < <(find trunk -name '*.php')
+          exit $status
 
       - name: WPCS coding standards
         run: composer run cs || true
