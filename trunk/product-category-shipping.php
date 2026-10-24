@@ -3,7 +3,7 @@
  * Plugin Name:       Product Category Shipping for WooCommerce
  * Plugin URI:        https://wordpress.org/plugins/product-category-shipping/
  * Description:       WooCommerce shipping plugin that charges per product category using flat-rate or tiered-quantity rules. Selected user roles can be offered a cart-wide Free Local Pickup option alongside the configured shipping rates.
- * Version:           1.4.3
+ * Version:           1.4.5
  * Author:            Braxton Moody
  * License:           GPL-2.0+
  * Text Domain:       product-category-shipping
@@ -18,10 +18,50 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PCSFW_VERSION', '1.4.3' );
-define( 'PCSFW_FILE',    __FILE__ );
-define( 'PCSFW_DIR',     plugin_dir_path( __FILE__ ) );
-define( 'PCSFW_URL',     plugin_dir_url( __FILE__ ) );
+define( 'BT_SHIPPING_VERSION', '1.4.5' );
+define( 'BT_SHIPPING_FILE',    __FILE__ );
+define( 'BT_SHIPPING_DIR',     plugin_dir_path( __FILE__ ) );
+define( 'BT_SHIPPING_URL',     plugin_dir_url( __FILE__ ) );
+define( 'PCSFW_URL',          plugin_dir_url( __FILE__ ) );
+define( 'PCSFW_VERSION',       BT_SHIPPING_VERSION );
+
+/* ---------------------------------------------------------------
+ * MIGRATE OLD OPTION NAMES (bt_ → pcsfw_)
+ *
+ * v1.4.4 renamed all option keys. Migrate existing saved data
+ * from the old keys to the new keys so no rates are lost on upgrade.
+ * Safe to run on every activation — only copies if new key is empty.
+ * --------------------------------------------------------------- */
+add_action( 'plugins_loaded', function () {
+    if ( get_option( 'pcsfw_shipping_rules' ) === false && get_option( 'bt_shipping_rules' ) !== false ) {
+        update_option( 'pcsfw_shipping_rules', get_option( 'bt_shipping_rules' ) );
+    }
+    if ( get_option( 'pcsfw_shipping_role_rules' ) === false && get_option( 'bt_shipping_role_rules' ) !== false ) {
+        update_option( 'pcsfw_shipping_role_rules', get_option( 'bt_shipping_role_rules' ) );
+    }
+    if ( get_option( 'pcsfw_shipping_settings' ) === false && get_option( 'bt_shipping_settings' ) !== false ) {
+        update_option( 'pcsfw_shipping_settings', get_option( 'bt_shipping_settings' ) );
+    }
+}, 5 );
+
+
+
+/* ---------------------------------------------------------------
+ * HPOS COMPATIBILITY
+ *
+ * WooCommerce 8.2+ defaults to High-Performance Order Storage (HPOS).
+ * Using the official FeaturesUtil API silences the "incompatible plugins"
+ * notice without suppressing any checks WooCommerce runs.
+ * --------------------------------------------------------------- */
+add_action( 'before_woocommerce_init', function() {
+    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+            'custom_order_tables',
+            __FILE__,
+            true
+        );
+    }
+} );
 
 /* ---------------------------------------------------------------
  * 1. LOAD SHARED + ADMIN CLASSES
@@ -30,18 +70,18 @@ define( 'PCSFW_URL',     plugin_dir_url( __FILE__ ) );
  *    packaging mode applies) and in wp-admin (the role picker),
  *    so it loads unconditionally.
  * ------------------------------------------------------------- */
-require_once PCSFW_DIR . 'includes/class-pcsfw-roles.php';
-require_once PCSFW_DIR . 'includes/class-pcsfw-admin.php';
+require_once BT_SHIPPING_DIR . 'includes/class-pcsfw-roles.php';
+require_once BT_SHIPPING_DIR . 'includes/class-pcsfw-admin.php';
 
 /* ---------------------------------------------------------------
  * 2. REGISTER SHIPPING METHOD WITH WOOCOMMERCE
  * ------------------------------------------------------------- */
 add_action( 'woocommerce_shipping_init', function () {
-    require_once PCSFW_DIR . 'includes/class-pcsfw-method.php';
+    require_once BT_SHIPPING_DIR . 'includes/class-pcsfw-method.php';
 } );
 
 add_filter( 'woocommerce_shipping_methods', function ( $methods ) {
-    $methods['pcsfw_category_shipping'] = 'PCSFW_Shipping_Method';
+    $methods['bt_category_shipping'] = 'PCSFW_Shipping_Method';
     return $methods;
 } );
 
@@ -86,7 +126,7 @@ add_action( 'plugins_loaded', function () {
  *    The total charged is identical to split mode; only the
  *    itemised per-category breakdown is not shown.
  *
- *    Both modes stamp 'pcsfw_roles' onto the package. WooCommerce
+ *    Both modes stamp 'bt_roles' onto the package. WooCommerce
  *    hashes the whole package array to key its shipping-rate cache,
  *    so including roles means a login, logout, or role change
  *    invalidates cached rates instead of serving a stale price.
@@ -109,8 +149,8 @@ add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
      */
     if ( PCSFW_Shipping_Roles::is_eligible( $bt_roles ) ) {
         foreach ( $packages as $k => $pkg ) {
-            $packages[ $k ]['pcsfw_mode']  = 'combined';
-            $packages[ $k ]['pcsfw_roles'] = $bt_roles;
+            $packages[ $k ]['bt_mode']  = 'combined';
+            $packages[ $k ]['bt_roles'] = $bt_roles;
         }
         return $packages;
     }
@@ -167,15 +207,15 @@ add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
 
     /*
      * Single-bucket carts need no split, but they still get the
-     * pcsfw_category / pcsfw_roles stamps so the method follows the same code
+     * bt_category / bt_roles stamps so the method follows the same code
      * path and the rate cache stays role-aware.
      */
     if ( 1 === count( $buckets ) && 1 === count( $packages ) ) {
         $only_slug = key( $buckets );
         foreach ( $packages as $k => $pkg ) {
-            $packages[ $k ]['pcsfw_mode']     = 'split';
-            $packages[ $k ]['pcsfw_category'] = $only_slug;
-            $packages[ $k ]['pcsfw_roles']    = $bt_roles;
+            $packages[ $k ]['bt_mode']     = 'split';
+            $packages[ $k ]['bt_category'] = $only_slug;
+            $packages[ $k ]['bt_roles']    = $bt_roles;
         }
         return $packages;
     }
@@ -198,9 +238,9 @@ add_filter( 'woocommerce_cart_shipping_packages', function( $packages ) {
             'user'            => $template['user']            ?? [ 'ID' => get_current_user_id() ],
             'destination'     => $template['destination']     ?? [],
             'cart_subtotal'   => $template['cart_subtotal']   ?? 0,
-            'pcsfw_mode'         => 'split',
-            'pcsfw_category'     => $slug,
-            'pcsfw_roles'        => $bt_roles,
+            'bt_mode'         => 'split',
+            'bt_category'     => $slug,
+            'bt_roles'        => $bt_roles,
         ];
     }
 

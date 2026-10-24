@@ -4,10 +4,8 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping-for-woocommerce, matching the wordpress.org slug.
+ * is product-category-shipping, matching the wordpress.org slug.
  */
-/* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-
 /**
  * PCSFW_Shipping_Roles
  *
@@ -64,7 +62,6 @@ class PCSFW_Shipping_Roles {
      * @return array<string,string> role_key => display name
      */
     public static function selectable_roles( $include_extra = [] ) {
-        /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
         $out = [ self::GUEST => __( 'Guest (not logged in)', 'product-category-shipping' ) ];
 
         if ( function_exists( 'wp_roles' ) ) {
@@ -76,7 +73,6 @@ class PCSFW_Shipping_Roles {
         foreach ( self::sanitize( $include_extra ) as $key ) {
             if ( ! isset( $out[ $key ] ) && null === self::find_registered( $key, $out ) ) {
                 /* translators: %s: user role key */
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 $out[ $key ] = /* translators: %s: role key */
                 sprintf( __( '%s (no longer registered)', 'product-category-shipping' ), $key );
             }

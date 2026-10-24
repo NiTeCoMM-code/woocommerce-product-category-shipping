@@ -8,8 +8,6 @@ defined( 'ABSPATH' ) || exit;
  * matching the wordpress.org slug. Folder names vary by install/auto-update version.
  * The declared domain is correct; the mismatch is a false positive.
  */
-/* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-
 /**
  * PCSFW_Admin
  *
@@ -45,7 +43,6 @@ class PCSFW_Admin {
     public function add_menu() {
         add_submenu_page(
             'woocommerce',
-            /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
             __( 'Category Shipping Rules', 'product-category-shipping' ),
             __( 'Category Shipping', 'product-category-shipping' ),
             'manage_woocommerce',
@@ -90,8 +87,8 @@ class PCSFW_Admin {
         ) {
             $saved_msg = sanitize_text_field( wp_unslash( $_GET['pcsfw_saved'] ) );
             $message   = $saved_msg === '1'
-                ? '<div class="bt-notice success">✓ Shipping rules saved successfully.</div>'
-                : '<div class="bt-notice">Something went wrong. Please try again.</div>';
+                ? '<div class="pcsfw-notice success">✓ Shipping rules saved successfully.</div>'
+                : '<div class="pcsfw-notice">Something went wrong. Please try again.</div>';
         }
 
         // Fetch all WooCommerce product categories
@@ -106,9 +103,9 @@ class PCSFW_Admin {
         <div id="pcsfw-shipping-wrap">
             <h1>
                 Category Shipping Rules
-                <span class="bt-badge">v<?php echo esc_html( PCSFW_VERSION ); ?></span>
+                <span class="pcsfw-badge">v<?php echo esc_html( PCSFW_VERSION ); ?></span>
             </h1>
-            <p class="bt-desc">
+            <p class="pcsfw-desc">
                 Configure per-category shipping rates. Assign <strong>Flat Rate</strong> or <strong>Tiered Quantity</strong> rules to any product category.
                 Rules apply at checkout based on item category counts in the cart.
             </p>
@@ -119,11 +116,9 @@ class PCSFW_Admin {
                 <?php wp_nonce_field( 'pcsfw_shipping_save', 'pcsfw_nonce' ); ?>
                 <input type="hidden" name="action" value="pcsfw_shipping_save">
 
-                <?php $this->render_pickup_card( $settings, array_merge( (array) $saved, (array) $role_saved ) ); ?>
-
-                <h2 class="bt-section-head">
+                <h2 class="pcsfw-section-head">
                     Default Shipping Rules
-                    <span class="bt-section-sub">Apply to every customer</span>
+                    <span class="pcsfw-section-sub">Apply to every customer</span>
                 </h2>
 
                 <div id="pcsfw-rules-container">
@@ -157,14 +152,16 @@ class PCSFW_Admin {
                     ?>
                 </div>
 
-                <button type="button" id="pcsfw-add-role-rule" class="bt-add-role"
+                <button type="button" id="pcsfw-add-role-rule" class="pcsfw-add-role"
                         data-container="pcsfw-role-rules-container"
                         data-template="pcsfw-role-rule-template"
                         data-count="<?php echo esc_attr( count( (array) $role_saved ) ); ?>">+ Add Override Rule</button>
 
-                <div class="bt-save-bar">
+                <?php $this->render_pickup_card( $settings, array_merge( (array) $saved, (array) $role_saved ) ); ?>
+
+                <div class="pcsfw-save-bar">
                     <input type="submit" value="Save Shipping Rules">
-                    <span class="bt-saved-msg">Rules saved!</span>
+                    <span class="pcsfw-saved-msg">Rules saved!</span>
                 </div>
             </form>
 
@@ -188,18 +185,17 @@ class PCSFW_Admin {
         $pickup_roles = PCSFW_Shipping_Roles::sanitize( $settings['pickup_roles'] ?? [] );
         $names        = PCSFW_Shipping_Roles::labels( $pickup_roles );
         ?>
-        <h2 class="bt-section-head role">
+        <h2 class="pcsfw-section-head role">
             Selected-Role Override Rules
-            <span class="bt-section-sub">
+            <span class="pcsfw-section-sub">
                 <?php
                 echo $names
                     ? esc_html( implode( ', ', $names ) )
-                    /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                     : esc_html__( 'No roles selected yet — these rules are inactive', 'product-category-shipping' );
                 ?>
             </span>
         </h2>
-        <div class="bt-callout" style="margin-top:0;margin-bottom:20px;">
+        <div class="pcsfw-callout" style="margin-top:0;margin-bottom:20px;">
             Rules here <strong>replace</strong> the default rule for the same product category, but only for the
             roles chosen in the Local Pickup card above. Configure them exactly like the default rules —
             Flat Rate or Tiered Quantity, per category.
@@ -252,17 +248,15 @@ class PCSFW_Admin {
             <div class="pcsfw-rule-header" onclick="pcsfwToggleCard(this)">
                 <h3>
                     🏪 Local Pickup &amp; User Roles
-                    <span class="bt-status-pill <?php echo $is_on ? 'on' : 'off'; ?>">
+                    <span class="pcsfw-status-pill <?php echo $is_on ? 'on' : 'off'; ?>">
                         <?php echo $is_on ? esc_html( strtoupper( 'Enabled for ' . count( $pickup_roles ) . ' role(s)' ) ) : 'OFF'; ?>
                     </span>
                 </h3>
                 <span>▾</span>
             </div>
             <div class="pcsfw-rule-body">
-
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 <label style="margin-top:0;"><?php esc_html_e( 'Roles that get the Local Pickup option', 'product-category-shipping' ); ?></label>
-                <select class="pcsfw-role-select" name="bt_settings[pickup_roles][]" multiple size="8">
+                <select class="pcsfw-role-select" name="pcsfw_settings[pickup_roles][]" multiple size="8">
                     <?php foreach ( $roles as $key => $display ) : ?>
                         <option value="<?php echo esc_attr( $key ); ?>"
                             <?php echo in_array( strtolower( (string) $key ), $selected_lc, true ) ? 'selected' : ''; ?>>
@@ -270,7 +264,7 @@ class PCSFW_Admin {
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <p class="bt-hint">
+                <p class="pcsfw-hint">
                     Ctrl/Cmd-click to select more than one. Each entry shows the role's display name followed by
                     its actual <strong>role key</strong> — custom roles from plugins like Meow Crew's Roles
                     Management tool often use a capitalised key such as <code>Distributor</code>, and the key is
@@ -280,7 +274,7 @@ class PCSFW_Admin {
                 </p>
 
                 <?php if ( $is_on ) : ?>
-                    <div class="bt-callout" style="border-color:#c9e2c9;background:#f4fbf4;color:#2c4a2c;">
+                    <div class="pcsfw-callout" style="border-color:#c9e2c9;background:#f4fbf4;color:#2c4a2c;">
                         <strong>Currently saved:</strong>
                         <?php echo esc_html( implode( ', ', $pickup_roles ) ); ?>
                         <br>
@@ -290,7 +284,7 @@ class PCSFW_Admin {
                     </div>
                 <?php endif; ?>
 
-                <div class="bt-callout">
+                <div class="pcsfw-callout">
                     <strong>What a selected role sees at checkout</strong>
                     <ul>
                         <li><strong>Shipping</strong> — one line, the total of every category rule that applies
@@ -305,40 +299,36 @@ class PCSFW_Admin {
                     Everyone <em>not</em> in a selected role keeps the itemised per-category lines exactly as before.
                 </div>
 
-                <div class="bt-row" style="margin-top:20px;">
+                <div class="pcsfw-row" style="margin-top:20px;">
                     <div>
-                        /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                         <label style="margin-top:0;"><?php esc_html_e( 'Pickup label', 'product-category-shipping' ); ?></label>
-                        <input type="text" name="bt_settings[pickup_label]"
+                        <input type="text" name="pcsfw_settings[pickup_label]"
                                value="<?php echo esc_attr( $pickup_label ); ?>"
                                placeholder="Local Pickup">
                     </div>
                     <div>
-                        /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                         <label style="margin-top:0;"><?php esc_html_e( 'Combined shipping label', 'product-category-shipping' ); ?></label>
-                        <input type="text" name="bt_settings[combined_label]"
+                        <input type="text" name="pcsfw_settings[combined_label]"
                                value="<?php echo esc_attr( $combined_label ); ?>"
                                placeholder="Shipping">
-                        <p class="bt-hint">Replaced with "Free Shipping" when the total is $0.</p>
+                        <p class="pcsfw-hint">Replaced with "Free Shipping" when the total is $0.</p>
                     </div>
                 </div>
-
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 <label><?php esc_html_e( 'Pickup note (optional)', 'product-category-shipping' ); ?></label>
-                <input type="text" name="bt_settings[pickup_note]"
+                <input type="text" name="pcsfw_settings[pickup_note]"
                        value="<?php echo esc_attr( $pickup_note ); ?>"
                        placeholder="e.g. 1234 Main St — Mon–Fri 9am–5pm">
-                <p class="bt-hint">Appended to the pickup label at checkout.</p>
+                <p class="pcsfw-hint">Appended to the pickup label at checkout.</p>
 
-                <div class="bt-toggle-row" style="margin-top:22px;">
-                    <input type="checkbox" class="bt-toggle"
-                           name="bt_settings[force_pickup_rate]" id="pcsfw_force_pickup_rate"
+                <div class="pcsfw-toggle-row" style="margin-top:22px;">
+                    <input type="checkbox" class="pcsfw-toggle"
+                           name="pcsfw_settings[force_pickup_rate]" id="pcsfw_force_pickup_rate"
                            value="1" <?php checked( $force_rate, '1' ); ?>>
-                    <label for="bt_force_pickup_rate">
+                    <label for="pcsfw_force_pickup_rate">
                         Always show both options, even if another plugin tries to remove one
                     </label>
                 </div>
-                <p class="bt-hint">
+                <p class="pcsfw-hint">
                     WooCommerce lets any plugin or snippet filter shipping rates away, and hiding paid rates
                     whenever a free rate exists is a common one — which would eat either Local Pickup or the
                     Shipping charge. With this on, both are re-inserted after every other filter has run.
@@ -347,7 +337,7 @@ class PCSFW_Admin {
                 </p>
 
                 <?php if ( $is_on && $mixed_tax ) : ?>
-                    <div class="bt-callout warn">
+                    <div class="pcsfw-callout warn">
                         <strong>Mixed tax settings detected.</strong>
                         Your rules do not agree on whether shipping is taxable. A combined line can carry only
                         one tax status, so for selected roles the whole shipping charge will be treated as
@@ -357,7 +347,7 @@ class PCSFW_Admin {
                 <?php endif; ?>
 
                 <?php if ( $is_on && ! empty( $open_tiers ) ) : ?>
-                    <div class="bt-callout warn">
+                    <div class="pcsfw-callout warn">
                         <strong>Check your top tier.</strong>
                         These tiered rules stop at a low quantity: <?php echo esc_html( implode( ', ', $open_tiers ) ); ?>.
                         If a cart exceeds the highest tier, no tier matches — that category then contributes
@@ -366,17 +356,14 @@ class PCSFW_Admin {
                     </div>
                 <?php endif; ?>
 
-                <div class="bt-tiers-wrap" style="margin-top:26px;">
-                    /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+                <div class="pcsfw-tiers-wrap" style="margin-top:26px;">
                     <h4><?php esc_html_e( 'Diagnostics — what each role actually gets', 'product-category-shipping' ); ?></h4>
-                    <table class="bt-tier-table">
+                    <table class="pcsfw-tier-table">
                         <thead>
                             <tr>
-                                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                                 <th><?php esc_html_e( 'Role', 'product-category-shipping' ); ?></th>
                                 <th><?php esc_html_e( 'Role key (what is matched)', 'product-category-shipping' ); ?></th>
                                 <th><?php esc_html_e( 'Users', 'product-category-shipping' ); ?></th>
-                                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                                 <th><?php esc_html_e( 'Checkout behaviour', 'product-category-shipping' ); ?></th>
                             </tr>
                         </thead>
@@ -405,7 +392,7 @@ class PCSFW_Admin {
                         <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <p class="bt-hint">
+                    <p class="pcsfw-hint">
                         If a role you expect is missing from this table, it is not registered as a WordPress
                         user role and this plugin cannot see it. If it is listed but the key looks different
                         from what you expected, the key column is the value that matters.
@@ -455,16 +442,14 @@ class PCSFW_Admin {
             <div class="pcsfw-rule-header" onclick="pcsfwToggleCard(this)">
                 <h3>
                     <?php echo esc_html( $header_label ); ?>
-                    <span class="bt-rule-type-badge"><?php echo esc_html( $type_badge ); ?></span>
+                    <span class="pcsfw-rule-type-badge"><?php echo esc_html( $type_badge ); ?></span>
                 </h3>
                 <span>▾</span>
             </div>
             <div class="pcsfw-rule-body">
-
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 <label><?php esc_html_e( 'Product Category', 'product-category-shipping' ); ?></label>
                 <select name="<?php echo esc_attr( $base ); ?>[category_slug]"
-                        onchange="btUpdateHeader(this)">
+                        onchange="pcsfwUpdateHeader(this)">
                     <option value="">— Select a category —</option>
                     <?php foreach ( (array) $categories as $cat ) : ?>
                         <option value="<?php echo esc_attr( $cat->slug ); ?>"
@@ -473,8 +458,6 @@ class PCSFW_Admin {
                         </option>
                     <?php endforeach; ?>
                 </select>
-
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 <label><?php esc_html_e( 'Shipping Label (shown to customer)', 'product-category-shipping' ); ?></label>
                 <input type="text" name="<?php echo esc_attr( $base ); ?>[label]"
                        value="<?php echo esc_attr( $label ); ?>"
@@ -487,31 +470,28 @@ class PCSFW_Admin {
                         When price is $0, label is automatically replaced with "Free Shipping".
                     <?php endif; ?>
                 </p>
-
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 <label style="margin-top:16px;"><?php esc_html_e( 'Rule Type', 'product-category-shipping' ); ?></label>
-                <div class="bt-type-selector">
+                <div class="pcsfw-type-selector">
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
                                id="type_flat_<?php echo esc_attr( $uid ); ?>" value="flat"
                                <?php checked( $type, 'flat' ); ?>
-                               onchange="btSwitchType(this,'flat')">
+                               onchange="pcsfwSwitchType(this,'flat')">
                         <label for="type_flat_<?php echo esc_attr( $uid ); ?>">💵 Flat Rate</label>
                     </span>
                     <span>
                         <input type="radio" name="<?php echo esc_attr( $base ); ?>[rule_type]"
                                id="type_tiered_<?php echo esc_attr( $uid ); ?>" value="tiered"
                                <?php checked( $type, 'tiered' ); ?>
-                               onchange="btSwitchType(this,'tiered')">
+                               onchange="pcsfwSwitchType(this,'tiered')">
                         <label for="type_tiered_<?php echo esc_attr( $uid ); ?>">📊 Tiered Quantity</label>
                     </span>
                 </div>
 
                 <!-- FLAT RATE SECTION -->
-                <div class="bt-flat-section" style="<?php echo $type !== 'flat' ? 'display:none;' : ''; ?>">
-                    <div class="bt-row">
+                <div class="pcsfw-flat-section" style="<?php echo $type !== 'flat' ? 'display:none;' : ''; ?>">
+                    <div class="pcsfw-row">
                         <div>
-                            /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                             <label><?php esc_html_e( 'Base Shipping Price ($)', 'product-category-shipping' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_price]"
@@ -520,7 +500,6 @@ class PCSFW_Admin {
                             <p style="margin:2px 0 0;font-size:.78rem;color:#888;">Charged for the first item.</p>
                         </div>
                         <div>
-                            /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                             <label><?php esc_html_e( 'Additional Item Price ($)', 'product-category-shipping' ); ?></label>
                             <input type="number" step="0.01" min="0"
                                    name="<?php echo esc_attr( $base ); ?>[flat_additional]"
@@ -532,10 +511,10 @@ class PCSFW_Admin {
                 </div>
 
                 <!-- TIERED SECTION -->
-                <div class="bt-tiered-section" style="<?php echo $type !== 'tiered' ? 'display:none;' : ''; ?>">
-                    <div class="bt-tiers-wrap">
+                <div class="pcsfw-tiered-section" style="<?php echo $type !== 'tiered' ? 'display:none;' : ''; ?>">
+                    <div class="pcsfw-tiers-wrap">
                         <h4>Quantity Tiers</h4>
-                        <table class="bt-tier-table">
+                        <table class="pcsfw-tier-table">
                             <thead>
                                 <tr>
                                     <th>Min Qty</th>
@@ -545,7 +524,7 @@ class PCSFW_Admin {
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody class="bt-tier-tbody">
+                            <tbody class="pcsfw-tier-tbody">
                                 <?php
                                 if ( ! empty( $tiers ) ) {
                                     foreach ( $tiers as $ti => $tier ) {
@@ -557,16 +536,16 @@ class PCSFW_Admin {
                                 ?>
                             </tbody>
                         </table>
-                        <button type="button" class="bt-add-tier"
-                                onclick="btAddTier(this, '<?php echo esc_js( $base ); ?>')">
+                        <button type="button" class="pcsfw-add-tier"
+                                onclick="pcsfwAddTier(this, '<?php echo esc_js( $base ); ?>')">
                             + Add Tier
                         </button>
                     </div>
                 </div>
 
                 <!-- TAX TOGGLE -->
-                <div class="bt-toggle-row" style="margin-top:18px;">
-                    <input type="checkbox" class="bt-toggle"
+                <div class="pcsfw-toggle-row" style="margin-top:18px;">
+                    <input type="checkbox" class="pcsfw-toggle"
                            name="<?php echo esc_attr( $base ); ?>[taxable]"
                            id="taxable_<?php echo esc_attr( $uid ); ?>"
                            value="1"
@@ -578,8 +557,8 @@ class PCSFW_Admin {
 
             </div><!-- .bt-rule-body -->
             <div class="pcsfw-rule-footer">
-                <button type="button" class="bt-remove-rule"
-                        onclick="btRemoveRule(this)">Remove Rule</button>
+                <button type="button" class="pcsfw-remove-rule"
+                        onclick="pcsfwRemoveRule(this)">Remove Rule</button>
             </div>
         </div><!-- .bt-rule-card -->
         <?php
@@ -606,19 +585,19 @@ class PCSFW_Admin {
                        name="<?php echo esc_attr( $prefix ); ?>[price]"
                        value="<?php echo esc_attr( $price ); ?>"
                        placeholder="10.20"
-                       class="bt-price-input"
+                       class="pcsfw-price-input"
                        <?php echo $free ? 'disabled style="opacity:.4"' : ''; ?>>
                 <?php if ( $free ) : ?>
-                    <span class="bt-free-price">Free</span>
+                    <span class="pcsfw-free-price">Free</span>
                 <?php endif; ?>
             </td>
             <td style="text-align:center;">
                 <input type="checkbox" name="<?php echo esc_attr( $prefix ); ?>[free]"
-                       value="1" class="bt-free-check"
-                       onchange="btToggleFree(this)"
+                       value="1" class="pcsfw-free-check"
+                       onchange="pcsfwToggleFree(this)"
                        <?php checked( $free ); ?>>
             </td>
-            <td><button type="button" class="bt-remove-tier" onclick="btRemoveTier(this)">✕</button></td>
+            <td><button type="button" class="pcsfw-remove-tier" onclick="pcsfwRemoveTier(this)">✕</button></td>
         </tr>
         <?php
     }
@@ -673,7 +652,6 @@ class PCSFW_Admin {
      * SAVE HANDLER
      * ------------------------------------------------------------------ */
     public function save_rules() {
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
         $pcsfw_nonce = isset( $_POST['pcsfw_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['pcsfw_nonce'] ) ) : '';
         if (
             ! wp_verify_nonce( $pcsfw_nonce, 'pcsfw_shipping_save' ) ||
@@ -683,9 +661,9 @@ class PCSFW_Admin {
         }
 
         /* ---- GLOBAL LOCAL PICKUP SETTINGS ---- */
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $pcsfw_post_settings = isset( $_POST['pcsfw_settings'] ) ? $_POST['pcsfw_settings'] : [];
-        $raw_settings     = wp_unslash( (array) $pcsfw_post_settings );
+        /* phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized */
+        $pcsfw_post_settings = isset( $_POST['pcsfw_settings'] ) ? wp_unslash( $_POST['pcsfw_settings'] ) : [];
+        $raw_settings     = (array) $pcsfw_post_settings;
 
         /*
          * Resolve each submitted key against the roles actually registered
@@ -712,12 +690,12 @@ class PCSFW_Admin {
         ] );
 
         /* ---- CATEGORY RULES (default + selected-role override) ---- */
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $pcsfw_rules_input = isset( $_POST['rules'] ) ? (array) $_POST['rules'] : [];
+        /* phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized */
+        $pcsfw_rules_input = isset( $_POST['rules'] ) ? (array) wp_unslash( $_POST['rules'] ) : [];
         update_option( 'pcsfw_shipping_rules', $this->sanitize_rule_set( $pcsfw_rules_input ) );
 
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $pcsfw_role_rules_input = isset( $_POST['role_rules'] ) ? (array) $_POST['role_rules'] : [];
+        /* phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized */
+        $pcsfw_role_rules_input = isset( $_POST['role_rules'] ) ? (array) wp_unslash( $_POST['role_rules'] ) : [];
         update_option( 'pcsfw_shipping_role_rules', $this->sanitize_rule_set( $pcsfw_role_rules_input ) );
 
         // Clear WooCommerce shipping cache

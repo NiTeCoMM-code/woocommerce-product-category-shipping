@@ -14,11 +14,9 @@
     <rule ref="WordPress"/>
 
     <!--
-        Known false positive: Plugin Check (and WPCS) infers the text domain from
-        the plugin folder name. The folder on a developer's machine may be
-        product-category-shipping-v1.4.2/ while the canonical Text Domain header
-        is product-category-shipping-for-woocommerce (matching the WP.org slug).
-        The mismatch does not affect translations, which use the declared domain.
+        The text domain is product-category-shipping-for-woocommerce (WP.org slug).
+        This rule is disabled because Plugin Check infers the expected domain from
+        the installed folder name, which varies by environment.
     -->
     <rule ref="WordPress.WP.I18n.TextDomainMismatch">
         <severity>0</severity>

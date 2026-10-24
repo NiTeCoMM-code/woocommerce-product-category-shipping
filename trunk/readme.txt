@@ -1,5 +1,5 @@
 === Product Category Shipping for WooCommerce ===
-Contributors:      Braxton Moody, techtankholdings
+Contributors:      techtankholdings
 Donate link:       https://techtankholdings.com/
 Tags:              woocommerce, shipping, category, flat rate, tiered shipping
 Requires at least: 6.4
@@ -7,7 +7,7 @@ Requires PHP:      7.4
 Tested up to:      7.1
 WC requires at least: 8.0
 WC tested up to:   9.3
-Stable tag:        1.4.3
+Stable tag:        1.4.5
 License:           GPL-2.0+
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,9 +43,10 @@ The plugin splits the cart into one WooCommerce shipping package per managed cat
 == Installation ==
 
 1. Upload the `product-category-shipping` folder to `/wp-content/plugins/` or install via the WordPress Plugins screen.
-2. Activate the plugin through the **Plugins** menu in WordPress.
-3. Go to **WooCommerce → Settings → Shipping → Product Category Shipping** and add rules for each category you manage.
-4. Optionally, go to **WooCommerce → Category Shipping** to configure Local Pickup roles and labels.
+2. Activate the plugin through the Plugins menu in WordPress.
+3. Go to **WooCommerce → Settings → Shipping → Shipping Zones** and add Shipping Method, "Category Shipping".
+4. Go to **WooCommerce → Category Shipping** to add rules for each product category you manage. You may also add a Free Local Pickup option for multiple select roles.
+5. Save Shipping Rules.
 
 == Frequently Asked Questions ==
 
@@ -67,7 +68,7 @@ Go to **WooCommerce → Category Shipping → Local Pickup & User Roles** and ad
 
 = Does the plugin work with WPML / Polylang? =
 
-The plugin loads its own text domain. Translation files (.po/.mo) can be placed in `wp-content/languages/plugins/bt-shipping-{locale}.mo`.
+The plugin loads its own text domain. Translation files (.po/.mo) can be placed in `wp-content/languages/plugins/product-category-shipping-for-woocommerce-{locale}.mo`.
 
 == Screenshots ==
 

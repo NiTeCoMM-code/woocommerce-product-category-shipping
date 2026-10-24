@@ -4,10 +4,8 @@ defined( 'ABSPATH' ) || exit;
 /*
  * TextDomainMismatch suppression: Plugin Check infers the expected text domain
  * from the plugin folder name on the server. The canonical Text Domain header
- * is product-category-shipping-for-woocommerce, matching the wordpress.org slug.
+ * is product-category-shipping, matching the wordpress.org slug.
  */
-/* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
-
 /**
  * PCSFW_Shipping_Method
  *
@@ -25,9 +23,8 @@ defined( 'ABSPATH' ) || exit;
 class PCSFW_Shipping_Method extends WC_Shipping_Method {
 
     public function __construct( $instance_id = 0 ) {
-        $this->id                 = 'pcsfw_category_shipping';
+        $this->id                 = 'bt_category_shipping';
         $this->instance_id        = absint( $instance_id );
-        /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
         $this->method_title       = __( 'Category Shipping', 'product-category-shipping' );
         $this->method_description = __( 'WooCommerce shipping that charges per product category using flat-rate or tiered-quantity rules, with optional cart-wide Free Local Pickup for selected roles.', 'product-category-shipping' );
         $this->supports           = [ 'shipping-zones', 'instance-settings' ];
@@ -70,7 +67,7 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
      * ------------------------------------------------------------------ */
     public function ensure_combined_rates( $rates, $package ) {
 
-        if ( ! isset( $package['pcsfw_mode'] ) || 'combined' !== $package['pcsfw_mode'] ) {
+        if ( ! isset( $package['bt_mode'] ) || 'combined' !== $package['bt_mode'] ) {
             return $rates;
         }
 
@@ -101,7 +98,7 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
             return;
         }
 
-        $mode = isset( $package['pcsfw_mode'] ) ? $package['pcsfw_mode'] : 'split';
+        $mode = isset( $package['bt_mode'] ) ? $package['bt_mode'] : 'split';
 
         if ( 'combined' === $mode ) {
             $this->calculate_combined( $package, $rules );
@@ -117,7 +114,7 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
      * ------------------------------------------------------------------ */
     protected function calculate_split( $package, $rules ) {
 
-        $pkg_category = isset( $package['pcsfw_category'] ) ? $package['pcsfw_category'] : null;
+        $pkg_category = isset( $package['bt_category'] ) ? $package['bt_category'] : null;
 
         // Items outside every managed category get no BT rates.
         if ( '_other' === $pkg_category ) {
@@ -146,8 +143,6 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
             if ( ! $amount['matched'] ) {
                 continue;
             }
-
-            /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
             $label      = ! empty( $rule['label'] ) ? $rule['label'] : __( 'Shipping', 'product-category-shipping' );
             $taxable    = ! empty( $rule['taxable'] ) && '1' === $rule['taxable'];
             $tax_status = $taxable ? 'taxable' : 'none';
@@ -156,12 +151,11 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
             $this->add_rate( [
                 // Rule index is part of the ID as of 1.2.0 so two rules on the
                 // same category no longer overwrite each other's rate.
-                'id'         => $this->pcsfw_get_rate_id( $idx . '_' . $slug . $suffix ),
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+                'id'         => $this->bt_get_rate_id( $idx . '_' . $slug . $suffix ),
                 'label'      => $amount['price'] > 0 ? $label : __( 'Free Shipping', 'product-category-shipping' ),
                 'cost'       => $amount['price'],
                 'tax_status' => $tax_status,
-                'meta_data'  => [ 'pcsfw_category' => $slug ],
+                'meta_data'  => [ 'bt_category' => $slug ],
             ] );
         }
     }
@@ -233,16 +227,14 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
         if ( $matched_any ) {
             $combined_label = ! empty( $settings['combined_label'] )
                 ? $settings['combined_label']
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
                 : __( 'Shipping', 'product-category-shipping' );
 
             $this->add_rate( [
-                'id'         => $this->pcsfw_get_rate_id( 'combined' ),
-                /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+                'id'         => $this->bt_get_rate_id( 'combined' ),
                 'label'      => $total > 0 ? $combined_label : __( 'Free Shipping', 'product-category-shipping' ),
                 'cost'       => $total,
                 'tax_status' => $tax_status,
-                'meta_data'  => [ 'pcsfw_mode' => 'combined' ],
+                'meta_data'  => [ 'bt_mode' => 'combined' ],
             ] );
         }
 
@@ -254,7 +246,6 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
          */
         $pickup_label = ! empty( $settings['pickup_label'] )
             ? $settings['pickup_label']
-            /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
             : __( 'Local Pickup', 'product-category-shipping' );
 
         if ( ! empty( $settings['pickup_note'] ) ) {
@@ -262,11 +253,11 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
         }
 
         $this->add_rate( [
-            'id'         => $this->pcsfw_get_rate_id( 'bt_pickup' ),
+            'id'         => $this->bt_get_rate_id( 'bt_pickup' ),
             'label'      => $pickup_label,
             'cost'       => 0.0,
             'tax_status' => 'none',
-            'meta_data'  => [ 'pcsfw_mode' => 'pickup' ],
+            'meta_data'  => [ 'bt_mode' => 'pickup' ],
         ] );
     }
 
@@ -426,7 +417,7 @@ class PCSFW_Shipping_Method extends WC_Shipping_Method {
     /**
      * Stable rate ID scoped to this method instance + suffix.
      */
-    public function pcsfw_get_rate_id( $suffix = '' ) {
+    public function bt_get_rate_id( $suffix = '' ) {
         return $this->id . '_' . $this->instance_id . '_' . $suffix;
     }
 }
